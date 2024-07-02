@@ -23,7 +23,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     //текст на полоске
     textTitle = new QLabel("Назначения", stripe);
-    QFont font("Cascadia Code", 74);
+    font.setPointSize(74);
     textTitle->setFont(font);
     textTitle->setStyleSheet("color: rgb(244, 244, 244);");
 
@@ -37,22 +37,15 @@ MainWindow::MainWindow(QWidget *parent)
     SideMenu();
 
 
-    matrixButton = PushButtonMenu( 35, 120, "Матрица");
-    fileButton = PushButtonMenu( 35, 200, "Из файла");
-    randomButton = PushButtonMenu( 35, 280, "Случайная \nгенерация");
+    matrixButton = PushButtonMenu( 35, 80, "Матрица");
+    fileButton = PushButtonMenu( 35, 160, "Из файла");
+    randomButton = PushButtonMenu( 35, 240, "Случайная \nгенерация");
 
 
 
     connect(matrixButton, &QPushButton::clicked, this, &MainWindow::Matrix);
     connect(fileButton, &QPushButton::clicked, this, &MainWindow::File);
     connect(randomButton, &QPushButton::clicked, this, &MainWindow::Random);
-
-
-
-
-
-
-
 
 }
 
@@ -70,9 +63,8 @@ void MainWindow::SideMenu(){
 
 
     textMenu = new QLabel("Способ ввода \nданных:", menu);
-    QFont font("Cascadia Code", 25 );
+    font.setPointSize(21);
     textMenu->setFont(font);
-
     textMenu->setStyleSheet("color: rgb(244, 244, 244);");
     textMenu->setAlignment(Qt::AlignLeft | Qt::AlignTop);
     QHBoxLayout *stripeLayout = new QHBoxLayout(menu);
@@ -86,13 +78,13 @@ void MainWindow::SideMenu(){
 QPushButton* MainWindow::PushButtonMenu( int x, int y, const QString &text)
 {
     QPushButton *button = new QPushButton(text, menu);
-    QFont font("Cascadia Code", 20);
+    font.setPointSize(20);
     button->setFont(font);
 
     button->setStyleSheet("color: rgb(244, 244, 244);");
     pl.setColor(QPalette::Button, QColor(44,154,176));
     button->setPalette(pl);
-    button->setGeometry(x, y, 200, 70); // Задайте размеры кнопки (ширину и высоту) по вашему усмотрению
+    button->setGeometry(x, y, 200, 70);
     return button;
 }
 
@@ -106,10 +98,10 @@ void MainWindow::Matrix(){
 
     countLabel = new QLabel("Количество \nработников:", menu);
     countSpinBox = new QSpinBox(menu);
-    countSpinBox->setMinimum(1);  // Минимальное значение
+    countSpinBox->setMinimum(2);  // Минимальное значение
     countSpinBox->setMaximum(10);
 
-    QFont font("Cascadia Code", 15);
+    font.setPointSize(15);
     countLabel->setFont(font);
     countLabel->setStyleSheet("color: rgb(244, 244, 244);");
     countLabel->setGeometry(35, 350, 150, 80);
@@ -134,9 +126,13 @@ void MainWindow::createMatrix()
     clearMenuExceptButtons();
     matrixTable = new QTableWidget(countSpinBox->value(), countSpinBox->value(), menu);
     for (int i = 0; i < countSpinBox->value(); ++i) {
-        matrixTable->setColumnWidth(i, 200/countSpinBox->value()); // Adjust the width as needed
+        matrixTable->setColumnWidth(i, 260/countSpinBox->value());
+        matrixTable->setRowHeight(i, 175/countSpinBox->value());
     }
+
     matrixTable->setGeometry(10, 350, 280, 200);
+    //matrixTable->setStyleSheet("color: rgb(44,103,115);"
+    //                           "background-color: rgb(244, 244, 244);");
     matrixTable->show();
     DaleeButtom = this->DataEntryButton();
     connect(DaleeButtom, &QPushButton::clicked, this, &MainWindow::checkAllCellsFilled);
@@ -158,12 +154,17 @@ void MainWindow::checkAllCellsFilled()
             }
         }
         if (!allFilled) {
+            QLabel *textError = new QLabel("Ошибка в заполнении\nВыберите способ заново",menu);
+            textError->setStyleSheet("color: red;");
+            font.setPointSize(12);
+            textError->setFont(font);
+            textError->setGeometry(10,305, 280, 50);
+            textError->show();
             break;
         }
     }
 
     if (allFilled){
-
         handleFilledMatrix();
     }
 
@@ -182,6 +183,12 @@ void MainWindow::handleFilledMatrix()
             }
         }
     }
+    QLabel *textError = new QLabel("Матрица заполнена",menu);
+    textError->setStyleSheet("color: rgb(244, 244, 244);");
+    font.setPointSize(12);
+    textError->setFont(font);
+    textError->setGeometry(10,305, 280, 50);
+    textError->show();
 
 
 }
@@ -191,9 +198,10 @@ void MainWindow::File(){
     clearMenuExceptButtons();
 
 
-    QLabel *text = new QLabel("Название файла:", menu);
-    text->setFont(QFont("Cascadia Code", 15));
+    QLabel *text = new QLabel("Название:", menu);
+    font.setPointSize(15);
     text->setStyleSheet("color: rgb(244, 244, 244);");
+    text->setFont(font);
     text->move(35, 370);
     text->show();
 
@@ -208,6 +216,12 @@ void MainWindow::File(){
 }
 void MainWindow::ReadLine(){
     fileName = line->text();
+    QLabel *textError = new QLabel("Файл считан",menu);
+    textError->setStyleSheet("color: rgb(244, 244, 244);");
+    font.setPointSize(12);
+    textError->setFont(font);
+    textError->setGeometry(10,305, 280, 50);
+    textError->show();
 }
 
 
@@ -215,10 +229,10 @@ void MainWindow::Random(){
     clearMenuExceptButtons();
     countLabel = new QLabel("Количество \nработников:", menu);
     countSpinBox = new QSpinBox(menu);
-    countSpinBox->setMinimum(1);  // Минимальное значение
+    countSpinBox->setMinimum(2);
     countSpinBox->setMaximum(10);
 
-    QFont font("Cascadia Code", 15);
+    font.setPointSize(15);
     countLabel->setFont(font);
     countLabel->setStyleSheet("color: rgb(244, 244, 244);");
     countLabel->setGeometry(35, 350, 150, 80);
@@ -239,7 +253,7 @@ void MainWindow::getSize(){
 QPushButton* MainWindow::DataEntryButton(){
     if (choice){
         QPushButton *button = new QPushButton("Далее", menu);
-        QFont font("Cascadia Code", 17);
+        font.setPointSize(17);
         button->setFont(font);
         button->setStyleSheet("color: rgb(244, 244, 244);");
         button->setGeometry(200, 550, 90, 40);
@@ -260,7 +274,7 @@ void MainWindow::clearMenuExceptButtons()
     for (QWidget *child : children) {
 
         if (child != matrixButton && child != fileButton && child != randomButton && child != textMenu && child != DaleeButtom && child != menu && child != stripe && child != textTitle) {
-            child->hide(); /
+            child->hide();
             child->deleteLater();
         }
     }

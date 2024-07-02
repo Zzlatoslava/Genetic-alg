@@ -23,7 +23,7 @@ private:
     //общее
     Ui::MainWindow *ui;
     QPalette pl;
-    //QSignalMapper *signalMapper;
+    QFont font = QFont("Cascadia Code");
     QWidget *stripe;
     QLabel *textTitle;
     QWidget *menu;
