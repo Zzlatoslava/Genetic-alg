@@ -3,6 +3,8 @@
 #include <iostream>
 #include <QtWidgets>
 
+#include "windows.h"
+
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
@@ -27,12 +29,14 @@ private:
     QWidget *stripe;
     QLabel *textTitle;
     QWidget *menu;
+    QWidget *setting;
+    QWidget *solution;
     QLabel *textMenu;
     QPushButton *matrixButton;
     QPushButton *fileButton;
     QPushButton *randomButton;
     QPushButton *DaleeButtom;
-
+    bool dataFlag = false;
     //файл
     QString fileName = nullptr;
     QLineEdit*line = nullptr;
@@ -52,9 +56,9 @@ private:
 
 
 
-
-    void createMatrix();
     void Matrix();
+    void closeMatrix();
+    void createMatrix();
     void checkAllCellsFilled();
     void handleFilledMatrix();
 
@@ -63,9 +67,18 @@ private:
     void ReadLine();
 
     void Random();
-    void getSize();
+    void getSizeRand();
 
     void clearMenuExceptButtons();
+
+    //решение
+    void SettingMenu();
+    void SolutionMenu();
+    QPushButton* NextButton();
+    //геттеры сеттеры
+    int getSizeMatrix();
+    QString* getValMatrix();
+
 
 
 };

@@ -36,6 +36,9 @@ MainWindow::MainWindow(QWidget *parent)
     //боковое меню
     SideMenu();
 
+    //решение
+
+
 
     matrixButton = PushButtonMenu( 35, 80, "Матрица");
     fileButton = PushButtonMenu( 35, 160, "Из файла");
@@ -46,6 +49,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(matrixButton, &QPushButton::clicked, this, &MainWindow::Matrix);
     connect(fileButton, &QPushButton::clicked, this, &MainWindow::File);
     connect(randomButton, &QPushButton::clicked, this, &MainWindow::Random);
+    //SolutionMenu();
+
 
 }
 
@@ -114,31 +119,41 @@ void MainWindow::Matrix(){
     DaleeButtom = this->DataEntryButton();
     connect(DaleeButtom, &QPushButton::clicked, this, &MainWindow::createMatrix);
 
-
-
-
-
-
 }
 
 void MainWindow::createMatrix()
 {
     clearMenuExceptButtons();
-    matrixTable = new QTableWidget(countSpinBox->value(), countSpinBox->value(), menu);
-    for (int i = 0; i < countSpinBox->value(); ++i) {
-        matrixTable->setColumnWidth(i, 260/countSpinBox->value());
-        matrixTable->setRowHeight(i, 175/countSpinBox->value());
-    }
 
-    matrixTable->setGeometry(10, 350, 280, 200);
+
+    if (countSpinBox->value() < 7){
+        matrixTable = new QTableWidget(countSpinBox->value(), countSpinBox->value(), menu);
+        matrixTable->setGeometry(10, 350, 280, 200);
+        for (int i = 0; i < countSpinBox->value(); ++i) {
+            matrixTable->setColumnWidth(i, 260/countSpinBox->value());
+            matrixTable->setRowHeight(i, 175/countSpinBox->value());
+        }
+    }
+    else {
+        matrixTable = new QTableWidget(countSpinBox->value(), countSpinBox->value());
+        matrixTable->setGeometry(550, 300,countSpinBox->value()*40+30, countSpinBox->value()*30+35);
+        for (int i = 0; i < countSpinBox->value(); ++i) {
+            matrixTable->setColumnWidth(i, 40);
+            matrixTable->setRowHeight(i, 30);
+        }
+    }
     //matrixTable->setStyleSheet("color: rgb(44,103,115);"
     //                           "background-color: rgb(244, 244, 244);");
     matrixTable->show();
     DaleeButtom = this->DataEntryButton();
+    connect(DaleeButtom, &QPushButton::clicked, this, &MainWindow::closeMatrix);
     connect(DaleeButtom, &QPushButton::clicked, this, &MainWindow::checkAllCellsFilled);
 
 
+
+
 }
+
 
 void MainWindow::checkAllCellsFilled()
 {
@@ -243,13 +258,21 @@ void MainWindow::Random(){
 
     choice = true;
     DaleeButtom = this->DataEntryButton();
-    connect(DaleeButtom, &QPushButton::clicked, this, &MainWindow::getSize);
+    connect(DaleeButtom, &QPushButton::clicked, this, &MainWindow::getSizeRand);
 }
 
-void MainWindow::getSize(){
+void MainWindow::getSizeRand(){
     sizeMatrix = countSpinBox->value();
+    QLabel *textError = new QLabel("Матрица сгенерирована",menu);
+    textError->setStyleSheet("color: rgb(244, 244, 244);");
+    font.setPointSize(12);
+    textError->setFont(font);
+    textError->setGeometry(35,305, 280, 50);
+    textError->show();
+    //SolutionMenu();
 
 }
+
 QPushButton* MainWindow::DataEntryButton(){
     if (choice){
         QPushButton *button = new QPushButton("Далее", menu);
@@ -278,4 +301,55 @@ void MainWindow::clearMenuExceptButtons()
             child->deleteLater();
         }
     }
+}
+
+
+void MainWindow::SolutionMenu(){
+    clearMenuExceptButtons();
+    solution = new QWidget(this);
+    solution->setGeometry(300, 150, 1150,600);
+    SettingMenu();
+
+
+}
+
+void MainWindow::SettingMenu(){
+
+    setting = new QWidget(solution);
+    textMenu = new QLabel("Вероятность мутации:", setting);
+
+    pl.setColor(QPalette::Window, QColor(140,178,188));
+    setting->setPalette(pl);
+    setting->setAutoFillBackground(true);
+    setting->setGeometry(0, 0, 300,150);
+
+
+
+
+    font.setPointSize(14);
+    textMenu->setFont(font);
+    textMenu->setStyleSheet("color: rgb(24, 24, 24);");
+    //textMenu->setGeometry(10, 10, 300,25);
+    textMenu->show();
+
+}
+
+
+
+int MainWindow::getSizeMatrix(){
+    if (sizeMatrix >0 ){
+        return sizeMatrix;
+    }
+    return 0;
+
+}
+QString* MainWindow::getValMatrix(){
+    if (valMatrix != nullptr ){
+        return &valMatrix;
+    }
+    return 0;
+}
+
+void MainWindow::closeMatrix(){
+    matrixTable->close();
 }
