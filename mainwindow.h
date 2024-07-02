@@ -32,6 +32,7 @@ private:
     QWidget *setting;
     QWidget *solution;
     QLabel *textMenu;
+    QLabel *textSetting;
     QPushButton *matrixButton;
     QPushButton *fileButton;
     QPushButton *randomButton;

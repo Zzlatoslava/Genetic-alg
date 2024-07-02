@@ -49,7 +49,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(matrixButton, &QPushButton::clicked, this, &MainWindow::Matrix);
     connect(fileButton, &QPushButton::clicked, this, &MainWindow::File);
     connect(randomButton, &QPushButton::clicked, this, &MainWindow::Random);
-    //SolutionMenu();
+    SolutionMenu();
+    SettingMenu();
 
 
 }
@@ -237,6 +238,9 @@ void MainWindow::ReadLine(){
     textError->setFont(font);
     textError->setGeometry(10,305, 280, 50);
     textError->show();
+   // DaleeButtom = this->DataEntryButton();
+    //connect(DaleeButtom, &QPushButton::clicked, this, &MainWindow::SettingMenu);
+    SettingMenu();
 }
 
 
@@ -269,7 +273,7 @@ void MainWindow::getSizeRand(){
     textError->setFont(font);
     textError->setGeometry(35,305, 280, 50);
     textError->show();
-    //SolutionMenu();
+    SolutionMenu();
 
 }
 
@@ -292,11 +296,12 @@ QPushButton* MainWindow::DataEntryButton(){
 void MainWindow::clearMenuExceptButtons()
 {
 
-    QList<QWidget*> children = this->findChildren<QWidget*>();
+    QList<QWidget*> children = menu->findChildren<QWidget*>();
 
     for (QWidget *child : children) {
 
-        if (child != matrixButton && child != fileButton && child != randomButton && child != textMenu && child != DaleeButtom && child != menu && child != stripe && child != textTitle) {
+        if (child != matrixButton && child != fileButton && child != randomButton && child != textMenu && child != DaleeButtom
+            ) {
             child->hide();
             child->deleteLater();
         }
@@ -305,10 +310,10 @@ void MainWindow::clearMenuExceptButtons()
 
 
 void MainWindow::SolutionMenu(){
-    clearMenuExceptButtons();
+    //clearMenuExceptButtons();
     solution = new QWidget(this);
     solution->setGeometry(300, 150, 1150,600);
-    SettingMenu();
+    //SettingMenu();
 
 
 }
@@ -316,21 +321,18 @@ void MainWindow::SolutionMenu(){
 void MainWindow::SettingMenu(){
 
     setting = new QWidget(solution);
-    textMenu = new QLabel("Вероятность мутации:", setting);
+    textSetting = new QLabel("Вероятность мутации:", setting);
 
-    pl.setColor(QPalette::Window, QColor(140,178,188));
-    setting->setPalette(pl);
-    setting->setAutoFillBackground(true);
+    setting->setStyleSheet("background-color: rgb(140,178,188);");
+    //setting->setAutoFillBackground(true);
     setting->setGeometry(0, 0, 300,150);
-
-
-
+    //setting->show();
 
     font.setPointSize(14);
-    textMenu->setFont(font);
-    textMenu->setStyleSheet("color: rgb(24, 24, 24);");
-    //textMenu->setGeometry(10, 10, 300,25);
-    textMenu->show();
+    textSetting->setFont(font);
+    textSetting->setStyleSheet("color: rgb(24, 24, 24);");
+    textSetting->setGeometry(10,10, 300,25);
+    textSetting->show();
 
 }
 
