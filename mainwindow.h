@@ -2,8 +2,8 @@
 #define MAINWINDOW_H
 #include <iostream>
 #include <QtWidgets>
+#include <vector>
 
-#include "windows.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -31,6 +31,7 @@ private:
     QWidget *menu;
     QWidget *setting;
     QWidget *solution;
+    QWidget *graph;
     QLabel *textMenu;
     QLabel *textSetting;
     QPushButton *matrixButton;
@@ -39,7 +40,14 @@ private:
     QPushButton *DaleeButtom;
     QLabel *textError;
 
+    //ответ
+    std::vector<int> best {4,2,3,1};
+    std::vector<int> good1 {1,3,3,4};
+    std::vector<int> good2 {3,1,4,2};
 
+    //граф
+    QGraphicsView *view;
+    QGraphicsScene *scene;
 
     //файл
     QString fileName = nullptr;
@@ -79,6 +87,7 @@ private:
     //решение
     void SettingMenu();
     void SolutionMenu();
+    void Graph();
 
 
 

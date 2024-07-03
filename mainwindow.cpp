@@ -35,7 +35,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     //боковое меню
     SideMenu();
-
+    //view = new QGraphicsView(graph);
+    //scene = new QGraphicsScene(graph);
     //решение
 
 
@@ -51,6 +52,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(randomButton, &QPushButton::clicked, this, &MainWindow::Random);
     SolutionMenu();
    //SettingMenu();
+    //view = new QGraphicsView(graph);
+   // scene = new QGraphicsScene(graph);
 
 
 }
@@ -105,7 +108,7 @@ void MainWindow::Matrix(){
 
     countLabel = new QLabel("Количество \nработников:", menu);
     countSpinBox = new QSpinBox(menu);
-    countSpinBox->setMinimum(2);  // Минимальное значение
+    countSpinBox->setMinimum(2);
     countSpinBox->setMaximum(10);
 
     font.setPointSize(15);
@@ -231,7 +234,6 @@ void MainWindow::File(){
     this->choice = true;
     DaleeButtom = this->DataEntryButton();
     connect(DaleeButtom, &QPushButton::clicked, this, &MainWindow::ReadLine);
-    //text->deleteLater();
 
 
 
@@ -313,6 +315,12 @@ void MainWindow::clearSideMenu()
             child->deleteLater();
         }
     }
+
+    fileName = nullptr;
+    valMatrix = nullptr;
+    sizeMatrix = 0 ;
+    allFilled = false;
+    verData = nullptr;
 }
 void MainWindow::clearSolutionMenu()
 {
@@ -321,11 +329,12 @@ void MainWindow::clearSolutionMenu()
 
     for (QWidget *child : children) {
 
-       if (child != setting ) {
+       if (child != setting && child != graph && child != view) {
             child->hide();
             child->deleteLater();
         }
     }
+    //scene->clear();
     setting->setStyleSheet("background-color: rgb(244, 244, 244)");
 }
 
@@ -337,36 +346,53 @@ void MainWindow::SolutionMenu(){
     setting = new QWidget(solution);
     setting->setGeometry(0, 0, 300,150);
 
+    graph = new QWidget(solution);
+    graph->setGeometry(450, 50, 650,550);
+
+
 
 }
 
 void MainWindow::SettingMenu(){
 
+
+
+
     //clearMenuExceptButtons();
     textSetting = new QLabel("Вероятность мутации:", setting);
-    QLineEdit *verLine = new QLineEdit(setting);
+    QLabel * percent = new QLabel("%", setting);
+    verLine = new QLineEdit(setting);
 
     setting->setStyleSheet("background-color: rgb(140,178,188);");
+    //graph->setStyleSheet("background-color: rgb(140,178,188);");
 
     font.setPointSize(14);
     textSetting->setFont(font);
     textSetting->setStyleSheet("color: rgb(24, 24, 24);");
-    textSetting->setGeometry(10,10, 220,25);
+    textSetting->setGeometry(0,10, 220,25);
     textSetting->show();
 
-    verLine->setGeometry(235, 10, 50, 30);
+    percent->setFont(font);
+    percent->setStyleSheet("color: rgb(24, 24, 24);");
+    percent->setGeometry(280,15, 25,25);
+    percent->show();
+
+
+    verLine->setGeometry(225, 10, 50, 30);
     verLine->setStyleSheet("color: rgb(224, 224, 224);"
                            "background-color: rgb(45, 45, 45)");
-    verLine->setText("33%");
+
+    //verLine->setText("33%");
     verLine->show();
 
     QPushButton *nextButton = NextButton();
+
     connect(nextButton, &QPushButton::clicked, this, &MainWindow::ReadVer);
 
 
 }
 
-
+//setiingMenu
 QPushButton* MainWindow::NextButton(){
 
     QPushButton *button = new QPushButton(">>", setting);
@@ -376,22 +402,118 @@ QPushButton* MainWindow::NextButton(){
                           "background-color: rgb(140,178,188);");
     button->setGeometry(250,110, 50,40);
     button->show();
+
+
     return button;
 
 
 }
 
 void MainWindow::ReadVer(){
-    if (verData != nullptr){
     verData = verLine->text();
+    if (!verData.isEmpty()) {
+        Graph();
+
+
     }
-    textError = new QLabel("Pfgbcfyj",menu);
-    textError->setStyleSheet("color: rgb(244, 244, 244);");
-    font.setPointSize(12);
-    textError->setFont(font);
-    textError->setGeometry(35,340, 280, 50);
-    textError->show();
 }
+
+//graph
+
+void MainWindow::Graph(){
+
+    QLabel *Error = new QLabel("Сработало",setting);
+    font.setPointSize(12);
+    Error->setFont(font);
+    Error->setGeometry(10,100, 280, 50);
+    Error->show();
+    int numVertices = best.size();
+
+
+    view = new QGraphicsView(graph);
+    scene = new QGraphicsScene(view);
+
+
+
+  /*  if (scene) {
+        scene->clear();
+    }
+    if (!scene){
+        scene = new QGraphicsScene(view);
+    }
+
+
+
+*/
+
+    view->setScene(scene);
+
+
+    QVBoxLayout *layout = new QVBoxLayout(graph);
+    layout->addWidget(view);
+    setLayout(layout);
+    view->setScene(scene);
+
+
+    const int radius = 30;
+    const int spacing = 550/numVertices;
+
+    // Создаем ребра между вершинами U и V
+    for (int i = 0; i < numVertices; ++i) {
+
+        int x1 = 50 + radius / 2;
+        int y1 = 50 + i * spacing + radius / 2;
+
+        int x2 = 250 + radius / 2;
+        int y2 = 50 + (best[i]-1) * spacing + radius / 2;
+        scene->addLine(x1, y1, x2, y2, QPen(QColor(33, 75, 86), 5));
+
+    }
+    for (int i = 0; i < numVertices; ++i) {
+
+        int x1 = 50 + radius / 2;
+        int y1 = 50 + i * spacing + radius / 2;
+
+        int x2 = 250 + radius / 2;
+        int y2 = 50 + (good1[i]-1) * spacing + radius / 2;
+        scene->addLine(x1, y1, x2, y2, QPen(QColor(82, 122, 132), 5, Qt::DashLine));
+
+    }
+    for (int i = 0; i < numVertices; ++i) {
+
+        int x1 = 50 + radius / 2;
+        int y1 = 50 + i * spacing + radius / 2;
+
+        int x2 = 250 + radius / 2;
+        int y2 = 50 + (good2[i]-1) * spacing + radius / 2;
+        scene->addLine(x1, y1, x2, y2, QPen(QColor(140, 178, 188), 5, Qt::DotLine));
+
+    }
+
+    // Создаем вершины множества U
+    for (int i = 0; i < numVertices; ++i) {
+        int x = 50;
+        int y = 50 + i * spacing;
+
+        QGraphicsEllipseItem *vertex = scene->addEllipse(x, y, radius, radius, QPen(QColor(34, 88, 101), 2), QBrush(QColor(34, 88, 101), Qt::SolidPattern));
+        QGraphicsTextItem *name = scene->addText(QString::number(i + 1), font);
+        name->setDefaultTextColor(QColor(224, 224, 224));
+        name->setPos(x + radius / 8, y - radius / 8);
+    }
+
+    // Создаем вершины множества V
+    for (int i = 0; i < numVertices; ++i) {
+        int x = 250;
+        int y = 50 + i * spacing;
+        QGraphicsEllipseItem *vertex = scene->addEllipse(x, y, radius, radius, QPen(QColor(34, 88, 101), 2), QBrush(QColor(34, 88, 101), Qt::SolidPattern));
+        QGraphicsTextItem *name = scene->addText(QString::number(i + 1), font);
+        name->setDefaultTextColor(QColor(224, 224, 224));
+        name->setPos(x + radius / 8, y - radius / 8);
+    }
+
+
+}
+
 
 
 
