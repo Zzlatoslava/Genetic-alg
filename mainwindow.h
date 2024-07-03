@@ -37,7 +37,10 @@ private:
     QPushButton *fileButton;
     QPushButton *randomButton;
     QPushButton *DaleeButtom;
-    bool dataFlag = false;
+    QLabel *textError;
+
+
+
     //файл
     QString fileName = nullptr;
     QLineEdit*line = nullptr;
@@ -70,12 +73,23 @@ private:
     void Random();
     void getSizeRand();
 
-    void clearMenuExceptButtons();
+    void clearSideMenu();
+    void clearSolutionMenu();
 
     //решение
     void SettingMenu();
     void SolutionMenu();
+
+
+
+    //считывание настроек
+    QString verData = nullptr;
+    QLineEdit* verLine = nullptr;
     QPushButton* NextButton();
+    void ReadVer();
+
+
+
     //геттеры сеттеры
     int getSizeMatrix();
     QString* getValMatrix();

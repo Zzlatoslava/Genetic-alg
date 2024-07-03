@@ -50,7 +50,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(fileButton, &QPushButton::clicked, this, &MainWindow::File);
     connect(randomButton, &QPushButton::clicked, this, &MainWindow::Random);
     SolutionMenu();
-    SettingMenu();
+   //SettingMenu();
 
 
 }
@@ -100,7 +100,8 @@ void MainWindow::Matrix(){
 
 
 
-    clearMenuExceptButtons();
+    clearSideMenu();
+    clearSolutionMenu();
 
     countLabel = new QLabel("Количество \nработников:", menu);
     countSpinBox = new QSpinBox(menu);
@@ -124,7 +125,8 @@ void MainWindow::Matrix(){
 
 void MainWindow::createMatrix()
 {
-    clearMenuExceptButtons();
+    clearSideMenu();
+
 
 
     if (countSpinBox->value() < 7){
@@ -199,21 +201,23 @@ void MainWindow::handleFilledMatrix()
             }
         }
     }
-    QLabel *textError = new QLabel("Матрица заполнена",menu);
+    textError = new QLabel("Матрица заполнена",menu);
     textError->setStyleSheet("color: rgb(244, 244, 244);");
     font.setPointSize(12);
     textError->setFont(font);
     textError->setGeometry(10,305, 280, 50);
     textError->show();
+    //countLabel->deleteLater();
+   // countSpinBox->deleteLater();
+    SettingMenu();
 
 
 }
 
 void MainWindow::File(){
 
-    clearMenuExceptButtons();
-
-
+    clearSideMenu();
+    clearSolutionMenu();
     QLabel *text = new QLabel("Название:", menu);
     font.setPointSize(15);
     text->setStyleSheet("color: rgb(244, 244, 244);");
@@ -227,25 +231,28 @@ void MainWindow::File(){
     this->choice = true;
     DaleeButtom = this->DataEntryButton();
     connect(DaleeButtom, &QPushButton::clicked, this, &MainWindow::ReadLine);
+    //text->deleteLater();
+
 
 
 }
 void MainWindow::ReadLine(){
     fileName = line->text();
-    QLabel *textError = new QLabel("Файл считан",menu);
+    if (fileName != nullptr){
+    textError = new QLabel("Файл считан",menu);
     textError->setStyleSheet("color: rgb(244, 244, 244);");
     font.setPointSize(12);
     textError->setFont(font);
     textError->setGeometry(10,305, 280, 50);
     textError->show();
-   // DaleeButtom = this->DataEntryButton();
-    //connect(DaleeButtom, &QPushButton::clicked, this, &MainWindow::SettingMenu);
     SettingMenu();
+    }
 }
 
 
 void MainWindow::Random(){
-    clearMenuExceptButtons();
+    clearSideMenu();
+    clearSolutionMenu();
     countLabel = new QLabel("Количество \nработников:", menu);
     countSpinBox = new QSpinBox(menu);
     countSpinBox->setMinimum(2);
@@ -267,13 +274,13 @@ void MainWindow::Random(){
 
 void MainWindow::getSizeRand(){
     sizeMatrix = countSpinBox->value();
-    QLabel *textError = new QLabel("Матрица сгенерирована",menu);
+    textError = new QLabel("Матрица сгенерирована",menu);
     textError->setStyleSheet("color: rgb(244, 244, 244);");
     font.setPointSize(12);
     textError->setFont(font);
     textError->setGeometry(35,305, 280, 50);
     textError->show();
-    SolutionMenu();
+    SettingMenu();
 
 }
 
@@ -293,47 +300,97 @@ QPushButton* MainWindow::DataEntryButton(){
     return nullptr;
 }
 
-void MainWindow::clearMenuExceptButtons()
+void MainWindow::clearSideMenu()
 {
 
     QList<QWidget*> children = menu->findChildren<QWidget*>();
 
     for (QWidget *child : children) {
 
-        if (child != matrixButton && child != fileButton && child != randomButton && child != textMenu && child != DaleeButtom
+        if (child != matrixButton && child != fileButton && child != randomButton && child != textMenu
             ) {
             child->hide();
             child->deleteLater();
         }
     }
 }
+void MainWindow::clearSolutionMenu()
+{
+
+    QList<QWidget*> children = solution->findChildren<QWidget*>();
+
+    for (QWidget *child : children) {
+
+       if (child != setting ) {
+            child->hide();
+            child->deleteLater();
+        }
+    }
+    setting->setStyleSheet("background-color: rgb(244, 244, 244)");
+}
 
 
 void MainWindow::SolutionMenu(){
-    //clearMenuExceptButtons();
+
     solution = new QWidget(this);
     solution->setGeometry(300, 150, 1150,600);
-    //SettingMenu();
+    setting = new QWidget(solution);
+    setting->setGeometry(0, 0, 300,150);
 
 
 }
 
 void MainWindow::SettingMenu(){
 
-    setting = new QWidget(solution);
+    //clearMenuExceptButtons();
     textSetting = new QLabel("Вероятность мутации:", setting);
+    QLineEdit *verLine = new QLineEdit(setting);
 
     setting->setStyleSheet("background-color: rgb(140,178,188);");
-    //setting->setAutoFillBackground(true);
-    setting->setGeometry(0, 0, 300,150);
-    //setting->show();
 
     font.setPointSize(14);
     textSetting->setFont(font);
     textSetting->setStyleSheet("color: rgb(24, 24, 24);");
-    textSetting->setGeometry(10,10, 300,25);
+    textSetting->setGeometry(10,10, 220,25);
     textSetting->show();
 
+    verLine->setGeometry(235, 10, 50, 30);
+    verLine->setStyleSheet("color: rgb(224, 224, 224);"
+                           "background-color: rgb(45, 45, 45)");
+    verLine->setText("33%");
+    verLine->show();
+
+    QPushButton *nextButton = NextButton();
+    connect(nextButton, &QPushButton::clicked, this, &MainWindow::ReadVer);
+
+
+}
+
+
+QPushButton* MainWindow::NextButton(){
+
+    QPushButton *button = new QPushButton(">>", setting);
+    font.setPointSize(20);
+    button->setFont(font);
+    button->setStyleSheet("color: rgb(24, 24, 24);"
+                          "background-color: rgb(140,178,188);");
+    button->setGeometry(250,110, 50,40);
+    button->show();
+    return button;
+
+
+}
+
+void MainWindow::ReadVer(){
+    if (verData != nullptr){
+    verData = verLine->text();
+    }
+    textError = new QLabel("Pfgbcfyj",menu);
+    textError->setStyleSheet("color: rgb(244, 244, 244);");
+    font.setPointSize(12);
+    textError->setFont(font);
+    textError->setGeometry(35,340, 280, 50);
+    textError->show();
 }
 
 
