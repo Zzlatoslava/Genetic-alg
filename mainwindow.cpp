@@ -45,12 +45,16 @@ MainWindow::MainWindow(QWidget *parent)
     fileButton = PushButtonMenu( 35, 160, "Из файла");
     randomButton = PushButtonMenu( 35, 240, "Случайная \nгенерация");
 
+    SolutionMenu();
+
 
 
     connect(matrixButton, &QPushButton::clicked, this, &MainWindow::Matrix);
     connect(fileButton, &QPushButton::clicked, this, &MainWindow::File);
     connect(randomButton, &QPushButton::clicked, this, &MainWindow::Random);
-    SolutionMenu();
+
+
+
    //SettingMenu();
     //view = new QGraphicsView(graph);
    // scene = new QGraphicsScene(graph);
@@ -324,18 +328,24 @@ void MainWindow::clearSideMenu()
 }
 void MainWindow::clearSolutionMenu()
 {
-
-    QList<QWidget*> children = solution->findChildren<QWidget*>();
+    plashca = new QWidget(solution);
+    plashca->setGeometry(450, 50, 650,550);
+    plashca->setStyleSheet("background-color: rgb(244, 244, 244)");
+    plashca->show();
+    QList<QWidget*> children = setting->findChildren<QWidget*>();
 
     for (QWidget *child : children) {
-
-       if (child != setting && child != graph && child != view) {
-            child->hide();
-            child->deleteLater();
+        if (child != setting && child != graph && child != view  ) {
+            child->hide(); // Скрываем виджет, но не удаляем
+            // child->deleteLater(); // Не удаляем, чтобы сохранить элементы
         }
     }
-    //scene->clear();
     setting->setStyleSheet("background-color: rgb(244, 244, 244)");
+
+    //setting->hide();
+    //scene->clear();
+   // view = new QGraphicsView(graph);
+   // scene = new QGraphicsScene(graph);
 }
 
 
@@ -348,6 +358,10 @@ void MainWindow::SolutionMenu(){
 
     graph = new QWidget(solution);
     graph->setGeometry(450, 50, 650,550);
+    //view = new QGraphicsView(graph);
+   // scene = new QGraphicsScene(graph);
+
+
 
 
 
@@ -404,6 +418,9 @@ QPushButton* MainWindow::NextButton(){
     button->show();
 
 
+    //view->setScene(scene);
+
+
     return button;
 
 
@@ -416,6 +433,7 @@ void MainWindow::ReadVer(){
 
 
     }
+
 }
 
 //graph
@@ -428,31 +446,19 @@ void MainWindow::Graph(){
     Error->setGeometry(10,100, 280, 50);
     Error->show();
     int numVertices = best.size();
-
-
+    plashca->hide();
     view = new QGraphicsView(graph);
-    scene = new QGraphicsScene(view);
 
-
-
-  /*  if (scene) {
-        scene->clear();
-    }
-    if (!scene){
-        scene = new QGraphicsScene(view);
-    }
-
-
-
-*/
-
+    scene = new QGraphicsScene(graph);
+   // scene = new QGraphicsScene(graph);
+    view->setGeometry(450, 50, 650, 550);
     view->setScene(scene);
 
 
     QVBoxLayout *layout = new QVBoxLayout(graph);
     layout->addWidget(view);
     setLayout(layout);
-    view->setScene(scene);
+
 
 
     const int radius = 30;
@@ -496,7 +502,9 @@ void MainWindow::Graph(){
         int y = 50 + i * spacing;
 
         QGraphicsEllipseItem *vertex = scene->addEllipse(x, y, radius, radius, QPen(QColor(34, 88, 101), 2), QBrush(QColor(34, 88, 101), Qt::SolidPattern));
+        font.setPointSize(17);
         QGraphicsTextItem *name = scene->addText(QString::number(i + 1), font);
+
         name->setDefaultTextColor(QColor(224, 224, 224));
         name->setPos(x + radius / 8, y - radius / 8);
     }
@@ -508,6 +516,7 @@ void MainWindow::Graph(){
         QGraphicsEllipseItem *vertex = scene->addEllipse(x, y, radius, radius, QPen(QColor(34, 88, 101), 2), QBrush(QColor(34, 88, 101), Qt::SolidPattern));
         QGraphicsTextItem *name = scene->addText(QString::number(i + 1), font);
         name->setDefaultTextColor(QColor(224, 224, 224));
+        font.setPointSize(17);
         name->setPos(x + radius / 8, y - radius / 8);
     }
 

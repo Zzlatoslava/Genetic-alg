@@ -41,9 +41,9 @@ private:
     QLabel *textError;
 
     //ответ
-    std::vector<int> best {4,2,3,1};
-    std::vector<int> good1 {1,3,3,4};
-    std::vector<int> good2 {3,1,4,2};
+    std::vector<int> best {4,2,3,1,5,6,7,8,9,4};
+    std::vector<int> good1 {1,3,3,4,1,1,2,3,5,9};
+    std::vector<int> good2 {3,1,4,2,5,6,7,8,9,2};
 
     //граф
     QGraphicsView *view;
@@ -103,6 +103,7 @@ private:
     int getSizeMatrix();
     QString* getValMatrix();
 
+    QWidget *plashca;
 
 
 };
