@@ -41,9 +41,9 @@ private:
     QLabel *textError;
 
     //ответ
-    std::vector<int> best {4,2,3,1,5,6,7,8,9,4};
-    std::vector<int> good1 {1,3,3,4,1,1,2,3,5,9};
-    std::vector<int> good2 {3,1,4,2,5,6,7,8,9,2};
+    std::vector<int> best {4,2,3,1,5};
+    std::vector<int> good1 {1,3,3,4,1};
+    std::vector<int> good2 {3,1,4,2,5};
 
     //граф
     QGraphicsView *view;
@@ -82,14 +82,16 @@ private:
     void getSizeRand();
 
     void clearSideMenu();
-    void clearSolutionMenu();
+    void clear(QWidget* parent);
 
     //решение
     void SettingMenu();
     void SolutionMenu();
     void Graph();
-
-
+    int iteration = 0;
+    QWidget *other;
+    //График
+    void Plot();
 
     //считывание настроек
     QString verData = nullptr;

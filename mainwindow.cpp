@@ -54,10 +54,11 @@ MainWindow::MainWindow(QWidget *parent)
     connect(randomButton, &QPushButton::clicked, this, &MainWindow::Random);
 
 
+    plashca = new QWidget(solution);
+    plashca->setGeometry(450, 50, 650,550);
+    plashca->setStyleSheet("background-color: rgb(244, 244, 244)");
 
-   //SettingMenu();
-    //view = new QGraphicsView(graph);
-   // scene = new QGraphicsScene(graph);
+
 
 
 }
@@ -108,8 +109,8 @@ void MainWindow::Matrix(){
 
 
     clearSideMenu();
-    clearSolutionMenu();
-
+    clear(setting);
+    clear(other);
     countLabel = new QLabel("Количество \nработников:", menu);
     countSpinBox = new QSpinBox(menu);
     countSpinBox->setMinimum(2);
@@ -214,8 +215,7 @@ void MainWindow::handleFilledMatrix()
     textError->setFont(font);
     textError->setGeometry(10,305, 280, 50);
     textError->show();
-    //countLabel->deleteLater();
-   // countSpinBox->deleteLater();
+
     SettingMenu();
 
 
@@ -224,7 +224,8 @@ void MainWindow::handleFilledMatrix()
 void MainWindow::File(){
 
     clearSideMenu();
-    clearSolutionMenu();
+    clear(setting);
+    clear(other);
     QLabel *text = new QLabel("Название:", menu);
     font.setPointSize(15);
     text->setStyleSheet("color: rgb(244, 244, 244);");
@@ -258,7 +259,8 @@ void MainWindow::ReadLine(){
 
 void MainWindow::Random(){
     clearSideMenu();
-    clearSolutionMenu();
+    clear(setting);
+    clear(other);
     countLabel = new QLabel("Количество \nработников:", menu);
     countSpinBox = new QSpinBox(menu);
     countSpinBox->setMinimum(2);
@@ -326,31 +328,25 @@ void MainWindow::clearSideMenu()
     allFilled = false;
     verData = nullptr;
 }
-void MainWindow::clearSolutionMenu()
+void MainWindow::clear(QWidget* parent)
 {
-    plashca = new QWidget(solution);
-    plashca->setGeometry(450, 50, 650,550);
-    plashca->setStyleSheet("background-color: rgb(244, 244, 244)");
-    plashca->show();
-    QList<QWidget*> children = setting->findChildren<QWidget*>();
+
+    QList<QWidget*> children = parent->findChildren<QWidget*>();
 
     for (QWidget *child : children) {
-        if (child != setting && child != graph && child != view  ) {
-            child->hide(); // Скрываем виджет, но не удаляем
-            // child->deleteLater(); // Не удаляем, чтобы сохранить элементы
+        if (child != setting && child != graph && child != view &&child != matrixButton && child != fileButton && child != randomButton && child != textMenu ) {
+            child->hide();
         }
     }
     setting->setStyleSheet("background-color: rgb(244, 244, 244)");
+    plashca->show();
 
-    //setting->hide();
-    //scene->clear();
-   // view = new QGraphicsView(graph);
-   // scene = new QGraphicsScene(graph);
 }
 
 
 void MainWindow::SolutionMenu(){
-
+    other = new QWidget(this);
+    other->setGeometry(300, 150, 1150,600);
     solution = new QWidget(this);
     solution->setGeometry(300, 150, 1150,600);
     setting = new QWidget(solution);
@@ -358,11 +354,6 @@ void MainWindow::SolutionMenu(){
 
     graph = new QWidget(solution);
     graph->setGeometry(450, 50, 650,550);
-    //view = new QGraphicsView(graph);
-   // scene = new QGraphicsScene(graph);
-
-
-
 
 
 }
@@ -370,15 +361,12 @@ void MainWindow::SolutionMenu(){
 void MainWindow::SettingMenu(){
 
 
-
-
-    //clearMenuExceptButtons();
     textSetting = new QLabel("Вероятность мутации:", setting);
     QLabel * percent = new QLabel("%", setting);
     verLine = new QLineEdit(setting);
 
     setting->setStyleSheet("background-color: rgb(140,178,188);");
-    //graph->setStyleSheet("background-color: rgb(140,178,188);");
+
 
     font.setPointSize(14);
     textSetting->setFont(font);
@@ -396,11 +384,9 @@ void MainWindow::SettingMenu(){
     verLine->setStyleSheet("color: rgb(224, 224, 224);"
                            "background-color: rgb(45, 45, 45)");
 
-    //verLine->setText("33%");
+
     verLine->show();
-
     QPushButton *nextButton = NextButton();
-
     connect(nextButton, &QPushButton::clicked, this, &MainWindow::ReadVer);
 
 
@@ -416,11 +402,6 @@ QPushButton* MainWindow::NextButton(){
                           "background-color: rgb(140,178,188);");
     button->setGeometry(250,110, 50,40);
     button->show();
-
-
-    //view->setScene(scene);
-
-
     return button;
 
 
@@ -440,17 +421,27 @@ void MainWindow::ReadVer(){
 
 void MainWindow::Graph(){
 
-    QLabel *Error = new QLabel("Сработало",setting);
-    font.setPointSize(12);
-    Error->setFont(font);
-    Error->setGeometry(10,100, 280, 50);
-    Error->show();
+    QLabel *answer = new QLabel("Решение:",other);
+    font.setPointSize(20);
+    answer->setFont(font);
+    answer->setGeometry(500,25, 280, 25);
+    answer->setStyleSheet("color: rgb(24, 24, 24);");
+    answer->show();
+
+    QLabel *iter = new QLabel("Итерация: "+QString::number(iteration),other);
+    font.setPointSize(20);
+    iter->setFont(font);
+    iter->setGeometry(20,250, 200, 25);
+    iter->setStyleSheet("color: rgb(24, 24, 24);");
+    iter->show();
+
+    iteration++;
     int numVertices = best.size();
     plashca->hide();
-    view = new QGraphicsView(graph);
 
+
+    view = new QGraphicsView(graph);
     scene = new QGraphicsScene(graph);
-   // scene = new QGraphicsScene(graph);
     view->setGeometry(450, 50, 650, 550);
     view->setScene(scene);
 
@@ -464,7 +455,7 @@ void MainWindow::Graph(){
     const int radius = 30;
     const int spacing = 550/numVertices;
 
-    // Создаем ребра между вершинами U и V
+
     for (int i = 0; i < numVertices; ++i) {
 
         int x1 = 50 + radius / 2;
@@ -519,8 +510,19 @@ void MainWindow::Graph(){
         font.setPointSize(17);
         name->setPos(x + radius / 8, y - radius / 8);
     }
+    Plot();
 
+}
 
+void MainWindow::Plot(){
+
+    QLabel *imageLabel = new QLabel(other);
+    imageLabel->setGeometry(20, 300, 500, 250);
+    QPixmap pixmap;
+    pixmap.load("D:/Genetic/untitled1/images/img.png");
+    pixmap = pixmap.scaled(imageLabel->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    imageLabel->setPixmap(pixmap);
+    imageLabel->show();
 }
 
 
