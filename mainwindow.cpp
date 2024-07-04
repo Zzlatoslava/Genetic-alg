@@ -353,7 +353,7 @@ void MainWindow::SolutionMenu(){
     setting->setGeometry(0, 0, 300,150);
 
     graph = new QWidget(solution);
-    graph->setGeometry(450, 50, 650,550);
+    graph->setGeometry(450, 50, 650,500);
 
 
 }
@@ -512,12 +512,16 @@ void MainWindow::Graph(){
     }
     Plot();
 
+    QPushButton *finishButton = PushButtonSolution(other, "Перейти в конец", 10, 545, 250, 45);
+    QPushButton *continueButton = PushButtonSolution(other, "Далее", 1000, 545, 90, 30);
+
+
 }
 
 void MainWindow::Plot(){
 
     QLabel *imageLabel = new QLabel(other);
-    imageLabel->setGeometry(20, 300, 500, 250);
+    imageLabel->setGeometry(20, 290, 500, 250);
     QPixmap pixmap;
     pixmap.load("D:/Genetic/untitled1/images/img.png");
     pixmap = pixmap.scaled(imageLabel->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
@@ -525,7 +529,18 @@ void MainWindow::Plot(){
     imageLabel->show();
 }
 
+QPushButton* MainWindow::PushButtonSolution(QWidget* parent, const QString &text, int x, int y, int width, int height){
 
+    QPushButton *button = new QPushButton(text, parent);
+    font.setPointSize(17);
+    button->setFont(font);
+    button->setStyleSheet("color: rgb(24, 24, 24);");
+    pl.setColor(QPalette::Button, QColor(244,244,244));
+    button->setPalette(pl);
+    button->setGeometry(x, y, width, height);
+    button->show();
+    return button;
+}
 
 
 int MainWindow::getSizeMatrix(){

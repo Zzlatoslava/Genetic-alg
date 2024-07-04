@@ -88,6 +88,7 @@ private:
     void SettingMenu();
     void SolutionMenu();
     void Graph();
+    QPushButton* PushButtonSolution(QWidget* parent, const QString &text, int x, int y, int width, int height);
     int iteration = 0;
     QWidget *other;
     //График
