@@ -360,7 +360,7 @@ void MainWindow::SolutionMenu(){
 
 void MainWindow::SettingMenu(){
 
-
+    DaleeButtom->setEnabled(false);
     textSetting = new QLabel("Вероятность мутации:", setting);
     QLabel * percent = new QLabel("%", setting);
     verLine = new QLineEdit(setting);
@@ -386,7 +386,7 @@ void MainWindow::SettingMenu(){
 
 
     verLine->show();
-    QPushButton *nextButton = NextButton();
+    nextButton = NextButton();
     connect(nextButton, &QPushButton::clicked, this, &MainWindow::ReadVer);
 
 
@@ -410,6 +410,8 @@ QPushButton* MainWindow::NextButton(){
 void MainWindow::ReadVer(){
     verData = verLine->text();
     if (!verData.isEmpty()) {
+        //clear(other);
+        nextButton->hide();
         Graph();
 
 
@@ -429,6 +431,7 @@ void MainWindow::Graph(){
     answer->show();
 
     QLabel *iter = new QLabel("Итерация: "+QString::number(iteration),other);
+    //setting->setStyleSheet("background-color: rgb(140,178,188);");
     font.setPointSize(20);
     iter->setFont(font);
     iter->setGeometry(20,250, 200, 25);

@@ -38,6 +38,7 @@ private:
     QPushButton *fileButton;
     QPushButton *randomButton;
     QPushButton *DaleeButtom;
+    QPushButton *nextButton;
     QLabel *textError;
 
     //ответ
