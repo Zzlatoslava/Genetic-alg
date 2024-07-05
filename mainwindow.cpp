@@ -135,8 +135,6 @@ void MainWindow::createMatrix()
 {
     clearSideMenu();
 
-
-
     if (countSpinBox->value() < 7){
         matrixTable = new QTableWidget(countSpinBox->value(), countSpinBox->value(), menu);
         matrixTable->setGeometry(10, 350, 280, 200);
@@ -199,13 +197,13 @@ void MainWindow::checkAllCellsFilled()
 
 void MainWindow::handleFilledMatrix()
 {
-    sizeMatrix = matrixTable->rowCount();
 
+    sizeMatrix = matrixTable->rowCount();
     for (int i = 0; i < matrixTable->rowCount(); ++i) {
         for (int j = 0; j < matrixTable->rowCount(); ++j) {
             QTableWidgetItem *item = matrixTable->item(i, j);
             if (item) {
-                valMatrix.append(item->text()) ;
+                matrix.SetCost(i,j,item->text().toInt());
             }
         }
     }
@@ -323,7 +321,7 @@ void MainWindow::clearSideMenu()
     }
 
     fileName = nullptr;
-    valMatrix = nullptr;
+  // matrix = nullptr;
     sizeMatrix = 0 ;
     allFilled = false;
     verData = nullptr;
@@ -421,6 +419,8 @@ void MainWindow::ReadVer(){
 
 //graph
 
+
+
 void MainWindow::Graph(){
 
     QLabel *answer = new QLabel("Решение:",other);
@@ -452,7 +452,6 @@ void MainWindow::Graph(){
     QVBoxLayout *layout = new QVBoxLayout(graph);
     layout->addWidget(view);
     setLayout(layout);
-
 
 
     const int radius = 30;
@@ -554,12 +553,32 @@ int MainWindow::getSizeMatrix(){
 
 }
 QString* MainWindow::getValMatrix(){
-    if (valMatrix != nullptr ){
-        return &valMatrix;
-    }
+  //  if (matrix.GetCost(i,j)!=nullptr ){
+       // return matrix;
+    //}
     return 0;
 }
 
 void MainWindow::closeMatrix(){
     matrixTable->close();
 }
+
+void MainWindow::Solution(){
+    std::mt19937 rnd(std::random_device{}());
+    int popSize=100;
+    bool maximise=false;
+    Population _population(rnd,popSize,sizeMatrix,maximise);
+    int iteration=1;
+    _population.Evaluate(matrix,iteration,best,good1,good2);
+
+    while (iteration<100){
+        _population.StoreBestSolution(sizeMatrix);
+        _population.Mutate(rnd,verData.toInt());
+        _population.ApplyCrossover(rnd,sizeMatrix);
+        _population.SeedBestSolution(rnd);
+        _population.Evaluate(matrix,iteration,best,good1,good2);
+        _population.Selection(rnd);
+        iteration++;
+    }
+}
+

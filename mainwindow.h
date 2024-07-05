@@ -3,7 +3,7 @@
 #include <iostream>
 #include <QtWidgets>
 #include <vector>
-
+#include "alg.cpp"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -55,8 +55,8 @@ private:
     QLineEdit*line = nullptr;
 
     //матрица
-    QString valMatrix = nullptr;
     int sizeMatrix;
+    CostMatrix matrix=CostMatrix(getSizeMatrix());
     QSpinBox* countSpinBox;
     QLabel *countLabel;
     QTableWidget *matrixTable;
@@ -89,6 +89,9 @@ private:
     void SettingMenu();
     void SolutionMenu();
     void Graph();
+    void Solution();
+
+
     QPushButton* PushButtonSolution(QWidget* parent, const QString &text, int x, int y, int width, int height);
     int iteration = 0;
     QWidget *other;
@@ -112,3 +115,4 @@ private:
 
 };
 #endif // MAINWINDOW_H
+
