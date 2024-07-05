@@ -326,6 +326,7 @@ void MainWindow::clearSideMenu()
     allFilled = false;
     verData = nullptr;
 }
+
 void MainWindow::clear(QWidget* parent)
 {
 
@@ -411,6 +412,7 @@ void MainWindow::ReadVer(){
         //clear(other);
         nextButton->hide();
         Graph();
+        //Solution();
 
 
     }
@@ -517,6 +519,9 @@ void MainWindow::Graph(){
     QPushButton *finishButton = PushButtonSolution(other, "Перейти в конец", 10, 545, 250, 45);
     QPushButton *continueButton = PushButtonSolution(other, "Далее", 1000, 545, 90, 30);
 
+    connect(finishButton, &QPushButton::clicked, this, &MainWindow::FinishSolution);
+    connect(continueButton, &QPushButton::clicked, this, &MainWindow::NextSolution);
+
 
 }
 
@@ -544,6 +549,17 @@ QPushButton* MainWindow::PushButtonSolution(QWidget* parent, const QString &text
     return button;
 }
 
+void MainWindow::NextSolution(){
+    clear(other);
+    Graph();
+    //Solution();
+}
+
+void MainWindow::FinishSolution(){
+    clear(other);
+    Graph();
+    //Solution();
+}
 
 int MainWindow::getSizeMatrix(){
     if (sizeMatrix >0 ){
