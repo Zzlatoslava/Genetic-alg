@@ -197,24 +197,34 @@ void MainWindow::checkAllCellsFilled()
 
 void MainWindow::handleFilledMatrix()
 {
-
+    bool ok;
     sizeMatrix = matrixTable->rowCount();
     for (int i = 0; i < matrixTable->rowCount(); ++i) {
         for (int j = 0; j < matrixTable->rowCount(); ++j) {
             QTableWidgetItem *item = matrixTable->item(i, j);
             if (item) {
-                matrix.SetCost(i,j,item->text().toInt());
+                matrix.SetCost(i,j,item->text().toInt(&ok));
+                if (!ok){
+                    Error(2);
+                    break;
+                }
             }
         }
-    }
-    textError = new QLabel("Матрица заполнена",menu);
-    textError->setStyleSheet("color: rgb(244, 244, 244);");
-    font.setPointSize(12);
-    textError->setFont(font);
-    textError->setGeometry(10,305, 280, 50);
-    textError->show();
+        if (!ok){
+            break;
+        }
+        else{
+            textError = new QLabel("Матрица заполнена",menu);
+            textError->setStyleSheet("color: rgb(244, 244, 244);");
+            font.setPointSize(12);
+            textError->setFont(font);
+            textError->setGeometry(10,305, 280, 50);
+            textError->show();
 
-    SettingMenu();
+            SettingMenu();
+        }
+    }
+
 
 
 }
@@ -324,7 +334,7 @@ void MainWindow::clearSideMenu()
   // matrix = nullptr;
     sizeMatrix = 0 ;
     allFilled = false;
-    verData = nullptr;
+
 }
 
 void MainWindow::clear(QWidget* parent)
@@ -349,7 +359,7 @@ void MainWindow::SolutionMenu(){
     solution = new QWidget(this);
     solution->setGeometry(300, 150, 1150,600);
     setting = new QWidget(solution);
-    setting->setGeometry(0, 0, 300,150);
+    setting->setGeometry(0, 0, 310,180);
 
     graph = new QWidget(solution);
     graph->setGeometry(450, 50, 650,500);
@@ -360,31 +370,58 @@ void MainWindow::SolutionMenu(){
 void MainWindow::SettingMenu(){
 
     DaleeButtom->setEnabled(false);
-    textSetting = new QLabel("Вероятность мутации:", setting);
+    QLabel *textVer = new QLabel("Вероятность мутации:", setting);
+    QLabel *textIter = new QLabel("Кол-во итераций:", setting);
+    QLabel *textPop = new QLabel("Размер популяции:", setting);
     QLabel * percent = new QLabel("%", setting);
     verLine = new QLineEdit(setting);
+    iterLine = new QLineEdit(setting);
+    popLine = new QLineEdit(setting);
 
     setting->setStyleSheet("background-color: rgb(140,178,188);");
 
-
     font.setPointSize(14);
-    textSetting->setFont(font);
-    textSetting->setStyleSheet("color: rgb(24, 24, 24);");
-    textSetting->setGeometry(0,10, 220,25);
-    textSetting->show();
+
+    textVer->setFont(font);
+    textIter->setFont(font);
+    textPop->setFont(font);
+
+    textVer->setStyleSheet("color: rgb(24, 24, 24);");
+    textPop->setStyleSheet("color: rgb(24, 24, 24);");
+    textIter->setStyleSheet("color: rgb(24, 24, 24);");
+
+
+    textIter->setGeometry(10,50, 220,25);
+    textVer->setGeometry(10,10, 220,25);
+    textPop->setGeometry(10,90, 220,25);
+
+    textIter->show();
+    textPop->show();
+    textVer->show();
 
     percent->setFont(font);
     percent->setStyleSheet("color: rgb(24, 24, 24);");
-    percent->setGeometry(280,15, 25,25);
+    percent->setGeometry(290,15, 25,25);
     percent->show();
 
 
-    verLine->setGeometry(225, 10, 50, 30);
+    verLine->setGeometry(235, 10, 50, 30);
     verLine->setStyleSheet("color: rgb(224, 224, 224);"
                            "background-color: rgb(45, 45, 45)");
 
 
+    iterLine->setGeometry(235, 50, 50, 30);
+    iterLine->setStyleSheet("color: rgb(224, 224, 224);"
+                           "background-color: rgb(45, 45, 45)");
+
+    popLine->setGeometry(235, 90, 50, 30);
+    popLine->setStyleSheet("color: rgb(224, 224, 224);"
+                           "background-color: rgb(45, 45, 45)");
     verLine->show();
+    iterLine->show();
+    popLine->show();
+
+
     nextButton = NextButton();
     connect(nextButton, &QPushButton::clicked, this, &MainWindow::ReadVer);
 
@@ -399,7 +436,7 @@ QPushButton* MainWindow::NextButton(){
     button->setFont(font);
     button->setStyleSheet("color: rgb(24, 24, 24);"
                           "background-color: rgb(140,178,188);");
-    button->setGeometry(250,110, 50,40);
+    button->setGeometry(260,140, 50,40);
     button->show();
     return button;
 
@@ -407,15 +444,22 @@ QPushButton* MainWindow::NextButton(){
 }
 
 void MainWindow::ReadVer(){
-    verData = verLine->text();
-    if (!verData.isEmpty()) {
-        //clear(other);
+    bool ok1  = false;
+    bool ok2  = false;
+    bool ok3  = false;
+    verData = verLine->text().toInt(&ok1);
+    iterData = iterLine->text().toInt(&ok2);
+    popData = popLine->text().toInt(&ok3);
+    if (!ok1  || !ok2 || !ok3 || verData < 0 || iterData < 0|| popData < 0 ){
+        Error(1);
+    }
+    else{
         nextButton->hide();
         Graph();
         //Solution();
-
-
     }
+
+
 
 }
 
@@ -516,8 +560,8 @@ void MainWindow::Graph(){
     }
     Plot();
 
-    QPushButton *finishButton = PushButtonSolution(other, "Перейти в конец", 10, 545, 250, 45);
-    QPushButton *continueButton = PushButtonSolution(other, "Далее", 1000, 545, 90, 30);
+    finishButton = PushButtonSolution(other, "Перейти в конец", 10, 545, 250, 45);
+    continueButton = PushButtonSolution(other, "Далее", 1000, 545, 90, 45);
 
     connect(finishButton, &QPushButton::clicked, this, &MainWindow::FinishSolution);
     connect(continueButton, &QPushButton::clicked, this, &MainWindow::NextSolution);
@@ -552,12 +596,14 @@ QPushButton* MainWindow::PushButtonSolution(QWidget* parent, const QString &text
 void MainWindow::NextSolution(){
     clear(other);
     Graph();
+
     //Solution();
 }
 
 void MainWindow::FinishSolution(){
     clear(other);
     Graph();
+
     //Solution();
 }
 
@@ -579,6 +625,31 @@ void MainWindow::closeMatrix(){
     matrixTable->close();
 }
 
+void MainWindow::Error(int numError){
+    QWidget *newWindow = new QWidget();
+    QLabel * error = new QLabel(newWindow);
+    newWindow->setGeometry(500,250, 300,200);
+
+    font.setPointSize(15);
+    error->setFont(font);
+    QVBoxLayout *layout = new QVBoxLayout(newWindow);
+    layout->addWidget(error);
+    //setLayout(layout);
+    switch(numError){
+        case 1:
+            error->setText("Введено неверное значение.\nПопробуйте снова");
+            error->show();
+            newWindow->show();
+            break;
+        case 2:
+            error->setText("Введено нечисловое значение.\nПопробуйте снова");
+            error->show();
+            newWindow->show();
+            break;
+    }
+}
+
+
 void MainWindow::Solution(){
     std::mt19937 rnd(std::random_device{}());
     int popSize=100;
@@ -589,7 +660,7 @@ void MainWindow::Solution(){
 
     while (iteration<100){
         _population.StoreBestSolution(sizeMatrix);
-        _population.Mutate(rnd,verData.toInt());
+        _population.Mutate(rnd,verData);
         _population.ApplyCrossover(rnd,sizeMatrix);
         _population.SeedBestSolution(rnd);
         _population.Evaluate(matrix,iteration,best,good1,good2);

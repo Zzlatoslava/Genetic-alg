@@ -40,6 +40,8 @@ private:
     QPushButton *DaleeButtom;
     QPushButton *nextButton;
     QLabel *textError;
+    QPushButton *finishButton;
+    QPushButton *continueButton;
 
     //ответ
     std::vector<int> best {4,2,3,1,5};
@@ -94,6 +96,8 @@ private:
     void FinishSolution();
 
 
+
+
     QPushButton* PushButtonSolution(QWidget* parent, const QString &text, int x, int y, int width, int height);
     int iteration = 0;
     QWidget *other;
@@ -101,13 +105,17 @@ private:
     void Plot();
 
     //считывание настроек
-    QString verData = nullptr;
-    QLineEdit* verLine = nullptr;
+    int verData  = -1;
+    int iterData = -1;
+    int popData = -1;
+    QLineEdit* verLine ;
+    QLineEdit* iterLine;
+    QLineEdit* popLine;
     QPushButton* NextButton();
     void ReadVer();
 
 
-
+    void Error(int numError);
     //геттеры сеттеры
     int getSizeMatrix();
     QString* getValMatrix();
