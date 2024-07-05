@@ -2,7 +2,6 @@
 #include <string>
 #include <unordered_set>
 #include <random>
-#include "mainwindow.cpp"
 // класс хромосомы Chromosome
 #include <vector>
 class Chromosome
@@ -31,7 +30,8 @@ public:
 
     int Get_vector(std::vector<int> &vec)
     {
-        vec=_workers;
+        vec.clear();
+        vec =_workers;
         return vec[_size] ;
 
     }
@@ -274,27 +274,47 @@ public:
     void Evaluate(CostMatrix &costMatrix, int iteration, std::vector<int> &best,std::vector<int> &good1,
                   std::vector<int> &good2)
     {
+        int bestCost = 0;
+        int secondBestCost = 0;
+        int thirdBestCost = 0;
+        int bestIndex = -1;
+        int secondBestIndex = -1;
+        int thirdBestIndex = -1;
+        int k ;
+        //std::vector<std::vector<int>> &res;
         for (int i = 0; i < _chromosomes.size(); ++i)
         {
             // суммарная стоимость затрат хромосомы
             long cost = costMatrix.GetChromosomeCost(_chromosomes[i], _maximise);
             _chromosomes[i].SetCost(cost);
-            // функция IsBetter True,если cost > _bestChromosomeCost
-            if (IsBetter(cost, _bestChromosomeCost))
-            {
-                _bestChromosomeCost = cost;
-                _bestChromosomeIndex = i;
-                if (best.empty()){
-                    _chromosomes[_bestChromosomeIndex].Get_vector(best);
-                }
-                else if(good1.empty()){
-                    _chromosomes[_bestChromosomeIndex].Get_vector(good1);
-                }
-                else {
-                    _chromosomes[_bestChromosomeIndex].Get_vector(good2);
-                }
+
+            if (IsBetter(cost, bestCost)) {
+                // Сдвигаем второе и третье место вниз
+                thirdBestCost = secondBestCost;
+                thirdBestIndex = secondBestIndex;
+                secondBestCost = bestCost;
+                secondBestIndex = bestIndex;
+
+                // Обновляем первое место
+                bestCost = cost;
+                bestIndex = i;
+            } else if (IsBetter(cost, secondBestCost)) {
+                // Сдвигаем третье место вниз
+                thirdBestCost = secondBestCost;
+                thirdBestIndex = secondBestIndex;
+
+                // Обновляем второе место
+                secondBestCost = cost;
+                secondBestIndex = i;
+            } else if (IsBetter(cost, thirdBestCost)) {
+                // Обновляем третье место
+                thirdBestCost = cost;
+                thirdBestIndex = i;
             }
         }
+        _chromosomes[bestIndex].Get_vector(best);
+        _chromosomes[secondBestIndex].Get_vector(good1);
+        _chromosomes[thirdBestIndex].Get_vector(good2);
     }
 
     // функция применения скрещивания

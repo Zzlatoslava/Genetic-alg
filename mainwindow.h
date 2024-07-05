@@ -2,7 +2,7 @@
 #define MAINWINDOW_H
 #include <iostream>
 #include <QtWidgets>
-#include <vector>
+//#include <vector>
 #include "alg.cpp"
 
 QT_BEGIN_NAMESPACE
@@ -57,8 +57,8 @@ private:
     QLineEdit*line = nullptr;
 
     //матрица
-    int sizeMatrix;
-    CostMatrix matrix=CostMatrix(getSizeMatrix());
+    int sizeMatrix = 0;
+    CostMatrix matrix = CostMatrix(getSizeMatrix());
     QSpinBox* countSpinBox;
     QLabel *countLabel;
     QTableWidget *matrixTable;
@@ -99,15 +99,15 @@ private:
 
 
     QPushButton* PushButtonSolution(QWidget* parent, const QString &text, int x, int y, int width, int height);
-    int iteration = 0;
+    int iteration = 1;
     QWidget *other;
     //График
     void Plot();
 
     //считывание настроек
-    int verData  = -1;
-    int iterData = -1;
-    int popData = -1;
+    int verData  = 33;
+    int iterData = 10;
+    int popData = 11;
     QLineEdit* verLine ;
     QLineEdit* iterLine;
     QLineEdit* popLine;

@@ -210,19 +210,17 @@ void MainWindow::handleFilledMatrix()
                 }
             }
         }
-        if (!ok){
-            break;
-        }
-        else{
-            textError = new QLabel("Матрица заполнена",menu);
-            textError->setStyleSheet("color: rgb(244, 244, 244);");
-            font.setPointSize(12);
-            textError->setFont(font);
-            textError->setGeometry(10,305, 280, 50);
-            textError->show();
 
-            SettingMenu();
-        }
+
+    }
+    if (ok){
+        textError = new QLabel("Матрица заполнена",menu);
+        textError->setStyleSheet("color: rgb(244, 244, 244);");
+        font.setPointSize(12);
+        textError->setFont(font);
+        textError->setGeometry(10,305, 280, 50);
+        textError->show();
+        SettingMenu();
     }
 
 
@@ -438,25 +436,44 @@ QPushButton* MainWindow::NextButton(){
                           "background-color: rgb(140,178,188);");
     button->setGeometry(260,140, 50,40);
     button->show();
+
+
+
+
     return button;
 
 
 }
 
 void MainWindow::ReadVer(){
-    bool ok1  = false;
-    bool ok2  = false;
-    bool ok3  = false;
-    verData = verLine->text().toInt(&ok1);
-    iterData = iterLine->text().toInt(&ok2);
-    popData = popLine->text().toInt(&ok3);
+    textError = new QLabel("Работает",menu);
+    textError->setStyleSheet("color: rgb(244, 244, 244);");
+    textError->setGeometry(10,400, 280, 50);
+    textError->show();
+
+    bool ok1  = true;
+    bool ok2  = true;
+    bool ok3  = true;
+
+
+    //verData = verLine->text().toInt(&ok1);
+    //iterData = iterLine->text().toInt(&ok2);
+    //popData = popLine->text().toInt(&ok3);
+
     if (!ok1  || !ok2 || !ok3 || verData < 0 || iterData < 0|| popData < 0 ){
         Error(1);
     }
     else{
+        if(iteration < iterData){
         nextButton->hide();
+
+        //best.clear();
+        //good1.clear();
+        //good2.clear();
+
+        Solution();
         Graph();
-        //Solution();
+        }
     }
 
 
@@ -484,7 +501,7 @@ void MainWindow::Graph(){
     iter->setStyleSheet("color: rgb(24, 24, 24);");
     iter->show();
 
-    iteration++;
+    //iteration++;
     int numVertices = best.size();
     plashca->hide();
 
@@ -608,7 +625,7 @@ void MainWindow::FinishSolution(){
 }
 
 int MainWindow::getSizeMatrix(){
-    if (sizeMatrix >0 ){
+    if (sizeMatrix > 0 ){
         return sizeMatrix;
     }
     return 0;
@@ -651,14 +668,19 @@ void MainWindow::Error(int numError){
 
 
 void MainWindow::Solution(){
-    std::mt19937 rnd(std::random_device{}());
-    int popSize=100;
-    bool maximise=false;
-    Population _population(rnd,popSize,sizeMatrix,maximise);
-    int iteration=1;
-    _population.Evaluate(matrix,iteration,best,good1,good2);
 
-    while (iteration<100){
+
+
+
+
+    std::mt19937 rnd(std::random_device{}());
+    //int popSize=100;
+    bool maximise= false ;
+    Population _population(rnd,popData,sizeMatrix,maximise);
+   // int iteration=1;
+   // _population.Evaluate(matrix,iteration,best,good1,good2);
+
+
         _population.StoreBestSolution(sizeMatrix);
         _population.Mutate(rnd,verData);
         _population.ApplyCrossover(rnd,sizeMatrix);
@@ -666,6 +688,6 @@ void MainWindow::Solution(){
         _population.Evaluate(matrix,iteration,best,good1,good2);
         _population.Selection(rnd);
         iteration++;
-    }
+
 }
 
