@@ -37,7 +37,7 @@ public:
     }
 
     // скрещивание
-    Chromosome Crossover(Chromosome &chr, std::mt19937 &rnd)
+    Chromosome Crossover(Chromosome &chr, std::mt19937 &rnd,int _size)
     {
         Chromosome child(_size);
         // генерируем index1 ,index2
@@ -335,20 +335,20 @@ public:
                     index2 = rnd() % size;
                 }
                 // вызываем функцию, с помощью которой проводим одноточечное скрещивание
-                Crossover(index1, index2, rnd, taskSize);
+               Crossover(index1, index2, rnd, taskSize,size);
             }
         }
     }
 
     // ф-я скрещивания, в кач-ве аргументов принимает 2 родителей, случайное число и размер задачи
-    void Crossover(int parentIndex1, int parentIndex2, std::mt19937 &rnd, int taskSize)
+    void Crossover(int parentIndex1, int parentIndex2, std::mt19937 &rnd, int taskSize,int size)
     {
         // выполняем одтоточесное скрещивание
         Chromosome chr1 = _chromosomes[parentIndex1];
         Chromosome chr2 = _chromosomes[parentIndex2];
 
-        Chromosome child1 = chr1.Crossover(chr2, rnd);
-        Chromosome child2 = chr2.Crossover(chr1, rnd);
+        Chromosome child1 = chr1.Crossover(chr2, rnd,size);
+        Chromosome child2 = chr2.Crossover(chr1, rnd,size);
         // обращаемся к элементу вектора _chromosomes по индексу родителя parentIndex1
         // и записываем в него скопированный child1
         _chromosomes[parentIndex1].Copy(child1);
@@ -434,60 +434,4 @@ public:
         }
     }
 };
-
-/*
-int main(){
-    int tasks = 5;
-    int popSize = 100;
-    std::mt19937 rnd(std::random_device{}());
-    bool maximise = false;
-    CostMatrix matrix(tasks);
-
-    matrix.SetCost(0, 0, 11);
-    matrix.SetCost(0, 1, 7);
-    matrix.SetCost(0, 2, 10);
-    matrix.SetCost(0, 3, 17);
-    matrix.SetCost(0, 4, 10);
-
-    matrix.SetCost(1, 0, 13);
-    matrix.SetCost(1, 1, 21);
-    matrix.SetCost(1, 2, 7);
-    matrix.SetCost(1, 3, 11);
-    matrix.SetCost(1, 4, 13);
-
-    matrix.SetCost(2, 0, 13);
-    matrix.SetCost(2, 1, 13);
-    matrix.SetCost(2, 2, 15);
-    matrix.SetCost(2, 3, 13);
-    matrix.SetCost(2, 4, 14);
-
-    matrix.SetCost(3, 0, 18);
-    matrix.SetCost(3, 1, 10);
-    matrix.SetCost(3, 2, 13);
-    matrix.SetCost(3, 3, 16);
-    matrix.SetCost(3, 4, 14);
-
-    matrix.SetCost(4, 0, 12);
-    matrix.SetCost(4, 1, 8);
-    matrix.SetCost(4, 2, 16);
-    matrix.SetCost(4, 3, 19);
-    matrix.SetCost(4, 4, 10);
-
-    Population _population(rnd, popSize, tasks, maximise);
-    int iteration = 1;
-    _population.Evaluate(matrix, iteration);
-
-    while (iteration < 100)
-    {
-        _population.StoreBestSolution(tasks);
-        _population.Mutate(rnd);
-        _population.ApplyCrossover(rnd, tasks);
-        _population.SeedBestSolution(rnd);
-        _population.Evaluate(matrix, iteration);
-        _population.Selection(rnd);
-        iteration++;
-    }
-    return 0;
-}
-*/
 
