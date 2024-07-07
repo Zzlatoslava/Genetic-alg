@@ -58,7 +58,7 @@ private:
 
     //матрица
     int sizeMatrix = 0;
-    CostMatrix matrix = CostMatrix(getSizeMatrix());
+    CostMatrix matrix= CostMatrix(0);
     QSpinBox* countSpinBox;
     QLabel *countLabel;
     QTableWidget *matrixTable;
@@ -121,7 +121,9 @@ private:
     QString* getValMatrix();
 
     QWidget *plashca;
-
+    void SetSolution();
+    Population *_population;
+    std::mt19937 rnd = std::mt19937(std::random_device{}());
 
 };
 #endif // MAINWINDOW_H

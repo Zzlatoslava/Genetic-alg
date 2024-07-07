@@ -61,6 +61,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 
 
+
 }
 
 MainWindow::~MainWindow()
@@ -252,13 +253,13 @@ void MainWindow::File(){
 void MainWindow::ReadLine(){
     fileName = line->text();
     if (fileName != nullptr){
-    textError = new QLabel("Файл считан",menu);
-    textError->setStyleSheet("color: rgb(244, 244, 244);");
-    font.setPointSize(12);
-    textError->setFont(font);
-    textError->setGeometry(10,305, 280, 50);
-    textError->show();
-    SettingMenu();
+        textError = new QLabel("Файл считан",menu);
+        textError->setStyleSheet("color: rgb(244, 244, 244);");
+        font.setPointSize(12);
+        textError->setFont(font);
+        textError->setGeometry(10,305, 280, 50);
+        textError->show();
+        SettingMenu();
     }
 }
 
@@ -329,7 +330,7 @@ void MainWindow::clearSideMenu()
     }
 
     fileName = nullptr;
-  // matrix = nullptr;
+    // matrix = nullptr;
     sizeMatrix = 0 ;
     allFilled = false;
 
@@ -410,7 +411,7 @@ void MainWindow::SettingMenu(){
 
     iterLine->setGeometry(235, 50, 50, 30);
     iterLine->setStyleSheet("color: rgb(224, 224, 224);"
-                           "background-color: rgb(45, 45, 45)");
+                            "background-color: rgb(45, 45, 45)");
 
     popLine->setGeometry(235, 90, 50, 30);
     popLine->setStyleSheet("color: rgb(224, 224, 224);"
@@ -446,9 +447,9 @@ QPushButton* MainWindow::NextButton(){
 }
 
 void MainWindow::ReadVer(){
-    textError = new QLabel("Работает",menu);
+    textError = new QLabel("Работает",setting);
     textError->setStyleSheet("color: rgb(244, 244, 244);");
-    textError->setGeometry(10,400, 280, 50);
+    textError->setGeometry(10,120, 280, 50);
     textError->show();
 
     bool ok1  = true;
@@ -464,16 +465,9 @@ void MainWindow::ReadVer(){
         Error(1);
     }
     else{
-        if(iteration < iterData){
         nextButton->hide();
-
-        //best.clear();
-        //good1.clear();
-        //good2.clear();
-
+        SetSolution();
         Solution();
-        Graph();
-        }
     }
 
 
@@ -611,17 +605,15 @@ QPushButton* MainWindow::PushButtonSolution(QWidget* parent, const QString &text
 }
 
 void MainWindow::NextSolution(){
-    clear(other);
-    Graph();
 
-    //Solution();
+
+    Solution();
 }
 
 void MainWindow::FinishSolution(){
-    clear(other);
-    Graph();
 
-    //Solution();
+
+    Solution();
 }
 
 int MainWindow::getSizeMatrix(){
@@ -632,8 +624,8 @@ int MainWindow::getSizeMatrix(){
 
 }
 QString* MainWindow::getValMatrix(){
-  //  if (matrix.GetCost(i,j)!=nullptr ){
-       // return matrix;
+    //  if (matrix.GetCost(i,j)!=nullptr ){
+    // return matrix;
     //}
     return 0;
 }
@@ -653,41 +645,47 @@ void MainWindow::Error(int numError){
     layout->addWidget(error);
     //setLayout(layout);
     switch(numError){
-        case 1:
-            error->setText("Введено неверное значение.\nПопробуйте снова");
-            error->show();
-            newWindow->show();
-            break;
-        case 2:
-            error->setText("Введено нечисловое значение.\nПопробуйте снова");
-            error->show();
-            newWindow->show();
-            break;
+    case 1:
+        error->setText("Введено неверное значение.\nПопробуйте снова");
+        error->show();
+        newWindow->show();
+        break;
+    case 2:
+        error->setText("Введено нечисловое значение.\nПопробуйте снова");
+        error->show();
+        newWindow->show();
+        break;
     }
 }
 
 
+
+void MainWindow::SetSolution(){
+
+    bool maximise= false ;
+    matrix = CostMatrix(getSizeMatrix());
+    _population = new Population(rnd,popData,sizeMatrix,maximise);
+    //_population->Evaluate(matrix,iteration,best,good1,good2);
+}
 void MainWindow::Solution(){
 
+    if(iteration < iterData){
 
 
+        //best.clear();
+        //good1.clear();
+        //good2.clear();
 
-
-    std::mt19937 rnd(std::random_device{}());
-    //int popSize=100;
-    bool maximise= false ;
-    Population _population(rnd,popData,sizeMatrix,maximise);
-   // int iteration=1;
-   // _population.Evaluate(matrix,iteration,best,good1,good2);
-
-
-        _population.StoreBestSolution(sizeMatrix);
-        _population.Mutate(rnd,verData);
-        _population.ApplyCrossover(rnd,sizeMatrix);
-        _population.SeedBestSolution(rnd);
-        _population.Evaluate(matrix,iteration,best,good1,good2);
-        _population.Selection(rnd);
+        _population->StoreBestSolution(sizeMatrix);
+        _population->Mutate(rnd,verData);
+        _population->ApplyCrossover(rnd,sizeMatrix);
+        _population->SeedBestSolution(rnd);
+        _population->Evaluate(matrix,iteration,best,good1,good2);
+        _population->Selection(rnd);
         iteration++;
+        clear(other);
+        Graph();
+    }
+
 
 }
-
