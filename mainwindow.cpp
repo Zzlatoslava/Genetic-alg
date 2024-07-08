@@ -54,9 +54,9 @@ MainWindow::MainWindow(QWidget *parent)
     connect(randomButton, &QPushButton::clicked, this, &MainWindow::Random);
 
 
-    plashca = new QWidget(solution);
-    plashca->setGeometry(450, 50, 650,550);
-    plashca->setStyleSheet("background-color: rgb(244, 244, 244)");
+    //plashca = new QWidget(solution);
+    //plashca->setGeometry(450, 50, 650,550);
+    //plashca->setStyleSheet("background-color: rgb(244, 244, 244)");
 
 
 
@@ -108,7 +108,9 @@ QPushButton* MainWindow::PushButtonMenu( int x, int y, const QString &text)
 void MainWindow::Matrix(){
 
 
-
+    if (scene != nullptr){
+           scene->clear();
+    }
     clearSideMenu();
     clear(setting);
     clear(other);
@@ -230,7 +232,9 @@ void MainWindow::handleFilledMatrix()
 }
 
 void MainWindow::File(){
-
+    if (scene != nullptr){
+        scene->clear();
+    }
     clearSideMenu();
     clear(setting);
     clear(other);
@@ -271,6 +275,9 @@ void MainWindow::ReadLine(){
 
 
 void MainWindow::Random(){
+    if (scene != nullptr){
+        scene->clear();
+    }
     clearSideMenu();
     clear(setting);
     clear(other);
@@ -366,12 +373,14 @@ void MainWindow::clear(QWidget* parent)
     QList<QWidget*> children = parent->findChildren<QWidget*>();
 
     for (QWidget *child : children) {
-        if (child != setting && child != graph && child != view &&child != matrixButton && child != fileButton && child != randomButton && child != textMenu ) {
+        if (child != setting && child != graph && child != view &&child != matrixButton && child != fileButton && child != randomButton && child != textMenu  ) {
             child->hide();
         }
     }
     setting->setStyleSheet("background-color: rgb(244, 244, 244)");
-    plashca->show();
+   // setting->hide();
+
+    //plashca->show();
 
 }
 
@@ -386,6 +395,16 @@ void MainWindow::SolutionMenu(){
 
     graph = new QWidget(solution);
     graph->setGeometry(450, 50, 650,500);
+    graph->setStyleSheet("background-color: rgb(140,178,188);");
+
+    view = new QGraphicsView(graph);
+    scene = new QGraphicsScene(graph);
+    view->setGeometry(450, 50, 650, 550);
+    view->setScene(scene);
+
+    layout = new QVBoxLayout(graph);
+    layout->addWidget(view);
+    setLayout(layout);
 
 
 }
@@ -471,10 +490,7 @@ QPushButton* MainWindow::NextButton(){
 }
 
 void MainWindow::ReadVer(){
-    textError = new QLabel("Работает",setting);
-    textError->setStyleSheet("color: rgb(244, 244, 244);");
-    textError->setGeometry(10,120, 280, 50);
-    textError->show();
+
 
     bool ok1  = true;
     bool ok2  = true;
@@ -505,7 +521,17 @@ void MainWindow::ReadVer(){
 
 
 void MainWindow::Graph(){
-    clear(other);
+   // clear(other);
+
+    //scene->clear();
+
+
+
+   scene->clear();
+
+
+
+
     QLabel *answer = new QLabel("Решение:",other);
     font.setPointSize(20);
     answer->setFont(font);
@@ -519,7 +545,7 @@ void MainWindow::Graph(){
         QLabel *qanswer = new QLabel(QString::number(best[it]) ,other);
         font.setPointSize(20);
         qanswer->setFont(font);
-        qanswer->setGeometry(20+k,230, 200, 25);
+        qanswer->setGeometry(670+k,25, 280, 25);
         qanswer->setStyleSheet("color: rgb(24, 24, 24);");
         qanswer->show();
         k+= 15;
@@ -530,7 +556,7 @@ void MainWindow::Graph(){
         QLabel *qanswer = new QLabel(QString::number(good1[it]) ,other);
         font.setPointSize(20);
         qanswer->setFont(font);
-        qanswer->setGeometry(20+k,230, 200, 25);
+        qanswer->setGeometry(670+k,25, 280, 25);
         qanswer->setStyleSheet("color: rgb(24, 24, 24);");
         qanswer->show();
         k+= 15;
@@ -542,7 +568,7 @@ void MainWindow::Graph(){
         QLabel *qanswer = new QLabel(QString::number(good2[it]) ,other);
         font.setPointSize(20);
         qanswer->setFont(font);
-        qanswer->setGeometry(20+k,230, 200, 25);
+        qanswer->setGeometry(670+k,25, 280, 25);
         qanswer->setStyleSheet("color: rgb(24, 24, 24);");
         qanswer->show();
         k+= 15;
@@ -554,28 +580,32 @@ void MainWindow::Graph(){
     setting->setStyleSheet("background-color: rgb(140,178,188);");
     font.setPointSize(20);
     iter->setFont(font);
-    iter->setGeometry(20,250, 200, 25);
+    iter->setGeometry(20,240, 200, 25);
     iter->setStyleSheet("color: rgb(24, 24, 24);");
     iter->show();
 
     //iteration++;
     int numVertices = best.size();
-    plashca->hide();
+
+    //plashca->hide();
 
 
-    view = new QGraphicsView(graph);
-    scene = new QGraphicsScene(graph);
-    view->setGeometry(450, 50, 650, 550);
-    view->setScene(scene);
+
+    //view->show();
+    //graph->show();
 
 
-    QVBoxLayout *layout = new QVBoxLayout(graph);
-    layout->addWidget(view);
-    setLayout(layout);
+
+
+
+
+
+    finishButton = PushButtonSolution(solution, "Перейти в конец", 10, 545, 250, 45);
+    continueButton = PushButtonSolution(solution, "Далее", 1000, 555, 90, 40);
 
 
     const int radius = 30;
-    const int spacing = 550/numVertices;
+    const int spacing = (490)/numVertices;
 
 
     for (int i = 0; i < numVertices; ++i) {
@@ -632,13 +662,18 @@ void MainWindow::Graph(){
         font.setPointSize(17);
         name->setPos(x + radius / 8, y - radius / 8);
     }
+
+
+
+
     Plot();
-
-    finishButton = PushButtonSolution(other, "Перейти в конец", 10, 545, 250, 45);
-    continueButton = PushButtonSolution(other, "Далее", 1000, 545, 90, 45);
-
     connect(finishButton, &QPushButton::clicked, this, &MainWindow::FinishSolution);
     connect(continueButton, &QPushButton::clicked, this, &MainWindow::NextSolution);
+
+
+
+
+
 
 
 }
@@ -646,7 +681,7 @@ void MainWindow::Graph(){
 void MainWindow::Plot(){
 
     QLabel *imageLabel = new QLabel(other);
-    imageLabel->setGeometry(20, 290, 500, 250);
+    imageLabel->setGeometry(20, 280, 500, 250);
     QPixmap pixmap;
     pixmap.load("D:/Genetic/untitled1/images/img.png");
     pixmap = pixmap.scaled(imageLabel->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
@@ -660,7 +695,7 @@ QPushButton* MainWindow::PushButtonSolution(QWidget* parent, const QString &text
     font.setPointSize(17);
     button->setFont(font);
     button->setStyleSheet("color: rgb(24, 24, 24);");
-    pl.setColor(QPalette::Button, QColor(244,244,244));
+    pl.setColor(QPalette::Button, QColor(34, 88, 101));
     button->setPalette(pl);
     button->setGeometry(x, y, width, height);
     button->show();
@@ -668,18 +703,32 @@ QPushButton* MainWindow::PushButtonSolution(QWidget* parent, const QString &text
 }
 
 void MainWindow::NextSolution(){
-    for (iteration; iteration <= iterData; iteration++){
+    textError = new QLabel("Работает",setting);
+    textError->setStyleSheet("color: rgb(24, 24, 24);");
+    textError->setGeometry(10,120, 280, 50);
+    textError->show();
+    if(iteration<=iterData){
         Solution();
+        Graph();
     }
+    else{
+        continueButton->hide();
+    }
+
 }
 
 void MainWindow::FinishSolution(){
+    textError = new QLabel("Работает",setting);
+    textError->setStyleSheet("color: rgb(224, 224, 224);");
+    textError->setGeometry(10,120, 280, 50);
+    textError->show();
 
-    for (iteration; iteration <= iterData; iteration++){
+    while(iteration <= iterData){
         Solution();
     }
 
-    Solution();
+    Graph();
+
 }
 
 QString* MainWindow::getValMatrix(){
@@ -710,8 +759,9 @@ void MainWindow::SetSolution(){
   //  Population population(populationSize, taskSize, maximise);
 }
 void MainWindow::Solution(){
+    clear(other);
 
-    if(iteration < iterData){
+
 
 
         //best.clear();
@@ -741,7 +791,7 @@ void MainWindow::Solution(){
         iteration++;
 
 
-    }
+
 
 
 }

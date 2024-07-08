@@ -50,7 +50,8 @@ private:
 
     //граф
     QGraphicsView *view;
-    QGraphicsScene *scene;
+    QGraphicsScene *scene = nullptr;
+    QVBoxLayout *layout;
 
     //файл
     QString fileName = nullptr;
