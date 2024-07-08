@@ -2,14 +2,8 @@
 #define MAINWINDOW_H
 #include <iostream>
 #include <QtWidgets>
-#include <QVBoxLayout>
-#include <QtCharts/QChart>
-#include <QtCharts/QValueAxis>
-#include <QtCharts/QLineSeries>
-
-//#include <vector>
 #include "alg.cpp"
-#include "graph.cpp"
+
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
@@ -49,9 +43,9 @@ private:
     QPushButton *continueButton;
 
     //ответ
-    std::vector<int> best {0,1,2,3,4,5,6,7,8,9};
-    std::vector<int> good1  {0,1,2,3,4,5,6,7,8,9};
-    std::vector<int> good2  {0,1,2,3,4,5,6,7,8,9};
+    std::vector<int> best {0,0,0,0,0,0,0,0,0,0};
+    std::vector<int> good1 {0,0,0,0,0,0,0,0,0,0} ;
+    std::vector<int> good2  {0,0,0,0,0,0,0,0,0,0};
 
     //граф
     QGraphicsView *view;
@@ -64,7 +58,7 @@ private:
 
     //матрица
     int sizeMatrix = 0;
-    CostMatrix costMatrix = CostMatrix(0);
+    CostMatrix costMatrix =  CostMatrix(0);
     QSpinBox* countSpinBox;
     QLabel *countLabel;
     QTableWidget *matrixTable;
@@ -102,7 +96,7 @@ private:
     void Solution();
     void NextSolution();
     void FinishSolution();
-    void build_graph();
+
 
 
 
@@ -132,9 +126,10 @@ private:
     void SetSolution();
     Population *_population;
 
-    int cost;
+
     void readMatrixFromFile();
 
 
 };
 #endif // MAINWINDOW_H
+

@@ -2,8 +2,6 @@
 #include "./ui_mainwindow.h"
 #include <iostream>
 #include <fstream>
-
-
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -544,7 +542,7 @@ void MainWindow::Graph(){
     int k = 0;
     for (int it = 0 ; it< best.size() ; ++it){
 
-        QLabel *qanswer = new QLabel(QString::number(best[it]) ,other);
+        QLabel *qanswer = new QLabel(QString::number(best[it]+1) ,other);
         font.setPointSize(20);
         qanswer->setFont(font);
         qanswer->setGeometry(670+k,25, 280, 25);
@@ -555,7 +553,7 @@ void MainWindow::Graph(){
     k+= 15;
     for (int it = 0 ; it< best.size() ; ++it){
 
-        QLabel *qanswer = new QLabel(QString::number(good1[it]) ,other);
+        QLabel *qanswer = new QLabel(QString::number(good1[it]+1) ,other);
         font.setPointSize(20);
         qanswer->setFont(font);
         qanswer->setGeometry(670+k,25, 280, 25);
@@ -567,7 +565,7 @@ void MainWindow::Graph(){
     k+= 15;
     for (int it = 0 ; it< best.size() ; ++it){
 
-        QLabel *qanswer = new QLabel(QString::number(good2[it]) ,other);
+        QLabel *qanswer = new QLabel(QString::number(good2[it]+1) ,other);
         font.setPointSize(20);
         qanswer->setFont(font);
         qanswer->setGeometry(670+k,25, 280, 25);
@@ -760,8 +758,6 @@ void MainWindow::SetSolution(){
     // Инициализация популяции
   //  Population population(populationSize, taskSize, maximise);
 }
-
-
 void MainWindow::Solution(){
     clear(other);
 
@@ -785,7 +781,7 @@ void MainWindow::Solution(){
        // _population->Selection();
 
 
-        cost=_population->Evaluate(costMatrix,best, good1, good2);
+        _population->Evaluate(costMatrix,best, good1, good2);
         _population->StoreBestSolution(sizeMatrix);
         _population->Mutate(verData);
         _population->ApplyCrossover(sizeMatrix);
@@ -805,31 +801,42 @@ void MainWindow::readMatrixFromFile() {
     QFile file(fileName);
 
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        //QMessageBox::critical(this, "Ошибка", "Не удалось открыть файл");
         Error(3);
+        clearSideMenu();
         return;
     }
 
     QTextStream in(&file);
+    std::vector<std::vector<int>> tempMatrix; // Временная матрица для чтения данных
     while (!in.atEnd()) {
         QString line = in.readLine();
         QStringList values = line.split(' ');
-        QVector<int> row;
+        std::vector<int> row;
         for (const QString &value : values) {
             bool ok;
             int num = value.toInt(&ok);
             if (!ok) {
-                //QMessageBox::critical(this, "Ошибка", "Некорректное значение в файле");
                 Error(4);
                 return;
             }
-            row.append(num);
+            row.push_back(num);
         }
-        //costMatrix.append(row);
+        tempMatrix.push_back(row);
     }
 
     file.close();
-   // handleMatrix(matrix);
+
+    sizeMatrix = tempMatrix.size();
+    costMatrix = CostMatrix(sizeMatrix);
+
+    for (int i = 0; i < sizeMatrix; ++i) {
+        for (int j = 0; j < sizeMatrix; ++j) {
+            costMatrix.SetCost(i, j, tempMatrix[i][j]);
+        }
+    }
+
+
+
 }
 
 
@@ -859,51 +866,4 @@ void MainWindow::Error(int numError){
     }
     error->show();
     newWindow->show();
-}
-
-void MainWindow:: build_graph(){
-    for (int i = 0; i < 5; ++i)
-        {
-            // Создаём представление графика
-           QChartView *chartView = new QChartView(this);
-            // Добавляем его в горизонтальный Layout
-            ui->horizontalLayout->addWidget(chartView);
-            // Создаём
-                    seed = cost;
-                    QLineSeries *series = new QLineSeries();
-                    int k = 0;
-                    while (k <= 100)
-                    {
-                        *series << QPointF(seed);
-                        ++k;
-                    }
-
-                    // Создаём график и добавляем в него функцию
-                    QChart *chart = new QChart();
-                    chart->addSeries(series);
-                    chart->legend()->hide();
-                    chart->setTitle("Graphic");
-
-                    // Добавим всплывающую подсказку для графика
-                    chart->setToolTip(QString("График №%1\n"
-                                              "Количество отсчётов %2").arg(i + 1).arg(k));
-
-                    // Настройка осей графика
-                    QValueAxis *axisX = new QValueAxis();
-                    axisX->setTitleText("x, м");
-                    axisX->setLabelFormat("%i");
-                    axisX->setTickCount(1);
-                    chart->addAxis(axisX, Qt::AlignBottom);
-                    series->attachAxis(axisX);
-
-                    QValueAxis *axisY = new QValueAxis();
-                    axisY->setTitleText("t, мс");
-                    axisY->setLabelFormat("%g");
-                    axisY->setTickCount(5);
-                    chart->addAxis(axisY, Qt::AlignLeft);
-                    series->attachAxis(axisY);
-
-                    // Устанавливаем график в представление
-                    chartView->setChart(chart);
-     }
 }
