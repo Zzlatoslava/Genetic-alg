@@ -80,9 +80,11 @@ private:
 
     void File();
     void ReadLine();
+    void inputmf(std::ifstream &f,int n, int m,  QString fileName);
 
     void Random();
     void getSizeRand();
+    void fill_random_num();
 
     void clearSideMenu();
     void clear(QWidget* parent);
@@ -124,6 +126,9 @@ private:
     void SetSolution();
     Population *_population;
     std::mt19937 rnd = std::mt19937(std::random_device{}());
+
+    void readMatrixFromFile();
+
 
 };
 #endif // MAINWINDOW_H

@@ -1,7 +1,7 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 #include <iostream>
-
+#include <fstream>
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -259,9 +259,14 @@ void MainWindow::ReadLine(){
         textError->setFont(font);
         textError->setGeometry(10,305, 280, 50);
         textError->show();
+
+
+        //функция чтения
+        readMatrixFromFile();
         SettingMenu();
     }
 }
+
 
 
 void MainWindow::Random(){
@@ -295,7 +300,22 @@ void MainWindow::getSizeRand(){
     textError->setFont(font);
     textError->setGeometry(35,305, 280, 50);
     textError->show();
+
+
+    fill_random_num();
     SettingMenu();
+
+}
+
+
+void MainWindow::fill_random_num(){
+    matrix = CostMatrix(sizeMatrix);
+    for (int i = 0; i < sizeMatrix; ++i) {
+        for (int j = 0; j < sizeMatrix; ++j) {
+            matrix.SetCost(i,j,rand()%100);
+
+        }
+    }
 
 }
 
@@ -634,29 +654,7 @@ void MainWindow::closeMatrix(){
     matrixTable->close();
 }
 
-void MainWindow::Error(int numError){
-    QWidget *newWindow = new QWidget();
-    QLabel * error = new QLabel(newWindow);
-    newWindow->setGeometry(500,250, 300,200);
 
-    font.setPointSize(15);
-    error->setFont(font);
-    QVBoxLayout *layout = new QVBoxLayout(newWindow);
-    layout->addWidget(error);
-    //setLayout(layout);
-    switch(numError){
-    case 1:
-        error->setText("Введено неверное значение.\nПопробуйте снова");
-        error->show();
-        newWindow->show();
-        break;
-    case 2:
-        error->setText("Введено нечисловое значение.\nПопробуйте снова");
-        error->show();
-        newWindow->show();
-        break;
-    }
-}
 
 
 
@@ -680,7 +678,7 @@ void MainWindow::Solution(){
         _population->Mutate(rnd,verData);
         _population->ApplyCrossover(rnd,sizeMatrix);
         _population->SeedBestSolution(rnd);
-        _population->Evaluate(matrix,iteration,best,good1,good2);
+        _population->Evaluate(matrix,best,good1,good2);
         _population->Selection(rnd);
         iteration++;
         clear(other);
@@ -688,4 +686,66 @@ void MainWindow::Solution(){
     }
 
 
+}
+
+
+void MainWindow::readMatrixFromFile() {
+    QFile file(fileName);
+
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        //QMessageBox::critical(this, "Ошибка", "Не удалось открыть файл");
+        Error(3);
+        return;
+    }
+
+    QTextStream in(&file);
+    QVector<QVector<int>> matrix;
+    while (!in.atEnd()) {
+        QString line = in.readLine();
+        QStringList values = line.split(' ');
+        QVector<int> row;
+        for (const QString &value : values) {
+            bool ok;
+            int num = value.toInt(&ok);
+            if (!ok) {
+                //QMessageBox::critical(this, "Ошибка", "Некорректное значение в файле");
+                Error(4);
+                return;
+            }
+            row.append(num);
+        }
+        matrix.append(row);
+    }
+
+    file.close();
+   // handleMatrix(matrix);
+}
+
+
+void MainWindow::Error(int numError){
+    QWidget *newWindow = new QWidget();
+    QLabel * error = new QLabel(newWindow);
+    newWindow->setGeometry(500,250, 300,200);
+
+    font.setPointSize(15);
+    error->setFont(font);
+    QVBoxLayout *layout = new QVBoxLayout(newWindow);
+    layout->addWidget(error);
+    //setLayout(layout);
+    switch(numError){
+    case 1:
+        error->setText("Введено неверное значение.\nПопробуйте снова");
+        break;
+    case 2:
+        error->setText("Введено нечисловое значение.\nПопробуйте снова");
+        break;
+    case 3:
+        error->setText("Неудалось открыть файл");
+        break;
+    case 4:
+        error->setText("Некорректное значение в файле");
+        break;
+    }
+    error->show();
+    newWindow->show();
 }
