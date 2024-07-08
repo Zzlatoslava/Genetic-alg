@@ -15,18 +15,14 @@ public:
     Chromosome(){
     }
 
-    Chromosome(std::mt19937 &rnd, int workers)
-    {
-        _size = workers;
-        _workers = std::vector<int>(workers);
-        Generate(rnd, workers);
-    }
-
     Chromosome(int workers)
     {
         _size = workers;
         _workers = std::vector<int>(workers);
+        Generate(workers);
     }
+
+
 
     int Get_vector(std::vector<int> &vec)
     {
@@ -37,17 +33,17 @@ public:
     }
 
     // скрещивание
-    Chromosome Crossover(Chromosome &chr, std::mt19937 &rnd,int _size)
+    Chromosome Crossover(Chromosome &chr,int _size)
     {
         Chromosome child(_size);
         // генерируем index1 ,index2
-        int index1 = rnd() % _size;  // остаток от деления сгенерированного числа на _size
-        int index2 = rnd() % _size;
+        int index1 = rand() % _size;  // остаток от деления сгенерированного числа на _size
+        int index2 = rand() % _size;
         int diff = std::abs(index1 - index2);
 
         while (index1 == index2 || diff + 1 >= _size)
         {
-            index2 = rnd() % _size;
+            index2 = rand() % _size;
             diff = std::abs(index1 - index2);
         }
 
@@ -80,14 +76,14 @@ public:
     }
 
     // функция мутации
-    void Mutation(std::mt19937 &rnd,int ver)
+    void Mutation( int ver)
     {
         for (int i = 0; i < _size; ++i)
         {
             // если остаток от деления этого случайного числа меньше 33,
-            // то i-му рабочем назначается задача, полученная методом GetRandomTask(rnd, _size)
-            if (rnd() % 100 < ver)
-                Assign(i, GetRandomTask(rnd, _size));
+            // то i-му рабочем назначается задача, полученная методом GetRandomTask(rand, _size)
+            if (rand() % 100 < ver)
+                Assign(i, GetRandomTask(_size));
         }
     }
 
@@ -135,17 +131,17 @@ public:
         return _workers[worker];
     }
 
-    int GetRandomTask(std::mt19937 &rnd, int taskRange)
+    int GetRandomTask(  int taskRange)
     {
-        return rnd() % taskRange;
+        return rand() % taskRange;
     }
 
-    void Generate(std::mt19937 &rnd, int taskRange)
+    void Generate(  int taskRange)
     {
         // назначает каждому рабочему случайную задачу
         for (int count = 0; count < _size; ++count)
         {
-            Assign(count, rnd() % taskRange);
+            Assign(count, rand() % taskRange);
         }
     }
 };
@@ -190,19 +186,6 @@ public:
         }
     }
 
-    CostMatrix(int agents, int tasks, std::mt19937 &rnd)
-    {
-        _costArray = std::vector<std::vector<int>>(agents, std::vector<int>(tasks));
-        _n = agents;
-
-        for (int i = 0; i < agents; ++i)
-        {
-            for (int j = 0; j < tasks; ++j)
-            {
-                SetCost(i, j, rnd() % 91 + 10);
-            }
-        }
-    }
 
     void SetCost(int agent, int task, int cost)
     {
@@ -249,24 +232,24 @@ private:
     bool _maximise; // переменная для минимизации
 
 public:
-    Population(std::mt19937 &rnd, int populationSize, int taskSize, bool maximise = true)
+    Population(  int populationSize, int taskSize, bool maximise = true)
     {
         _bestChromosomeCost = maximise ? -1 : 9999999999;
         _bestChromosomeIndex = -1;
         _chromosomes = std::vector<Chromosome>(populationSize);
         _maximise = maximise;
-        CreateArbitraryPopulation(rnd, populationSize, taskSize);
+        CreateArbitraryPopulation(populationSize, taskSize);
     }
 
     // создаем произвольную популяцию
-    void CreateArbitraryPopulation(std::mt19937 &rnd, int populationSize, int taskSize)
+    void CreateArbitraryPopulation(  int populationSize, int taskSize)
     // в качестве аргументов подаем генератор псевдослучайных чисел размер популяции и задачи
     {
         for (int i = 0; i < populationSize; ++i)
         {
             // обращаемся к каждому элементу вектора _chromosomes по индексу
             // и каждому рабочему присваеваем случайную задачу для данной популяции
-            _chromosomes[i] = Chromosome(rnd, taskSize);
+            _chromosomes[i] = Chromosome(taskSize);
         }
     }
 
@@ -319,14 +302,14 @@ public:
     }
 
     // ф-я скрещивания, в кач-ве аргументов принимает 2 родителей, случайное число и размер задачи
-    void Crossover(int parentIndex1, int parentIndex2, std::mt19937 &rnd, int taskSize,int size)
+    void Crossover(int parentIndex1, int parentIndex2,int size)
     {
         // выполняем одтоточесное скрещивание
         Chromosome chr1 = _chromosomes[parentIndex1];
         Chromosome chr2 = _chromosomes[parentIndex2];
 
-        Chromosome child1 = chr1.Crossover(chr2, rnd,size);
-        Chromosome child2 = chr2.Crossover(chr1, rnd,size);
+        Chromosome child1 = chr1.Crossover(chr2, size);
+        Chromosome child2 = chr2.Crossover(chr1, size);
         // обращаемся к элементу вектора _chromosomes по индексу родителя parentIndex1
         // и записываем в него скопированный child1
         _chromosomes[parentIndex1].Copy(child1);
@@ -335,41 +318,41 @@ public:
 
 
     // функция применения скрещивания
-    void ApplyCrossover(std::mt19937 &rnd, int taskSize)
+    void ApplyCrossover(int sizeM)
     {
-        int size = _chromosomes.size();
+        int size = sizeM;
         for (int i = 0; i < size; ++i)
         {
-            int prob = rnd() % 100;
+            int prob = rand() % 100;
             if (prob < 50)
             {
                 // выбираем два числа, как остаток от деления случайных чисел на размер хромосомы
-                int index1 = rnd() % size;
-                int index2 = rnd() % size;
+                int index1 = rand() % size;
+                int index2 = rand() % size;
 
                 while (index1 == index2)
                 {
-                    index2 = rnd() % size;
+                    index2 = rand() % size;
                 }
                 // вызываем функцию, с помощью которой проводим одноточечное скрещивание
-               Crossover(index1, index2, rnd, taskSize,size);
+                Crossover(index1, index2,size);
             }
         }
     }
 
     // функция мутации, в кач-ве аргумента принимает случайное число
-    void Mutate(std::mt19937 &rnd,int ver)
+    void Mutate(int ver)
     {
-            int size =_chromosomes.size();
+        int size =_chromosomes.size();
         for (int i = 0; i < size; ++i)
         {
             // для каждой хромосомы считаем число prob,
             // определенное как остаток от деления сгенерированного числа на 100
-            int prob = rnd() % 100;
+            int prob = rand() % 100;
             if (prob < 5)
             {
                 // для каждого элемента вектора _chromosomes вызываем функцию Mutation
-                _chromosomes[i].Mutation(rnd,ver);
+                _chromosomes[i].Mutation(ver);
             }
         }
     }
@@ -381,14 +364,14 @@ public:
     }
 
 
-    void SeedBestSolution(std::mt19937 &rnd)
+    void SeedBestSolution()
     {
         // определяется остатком от деления случайного числа на размер вектора  _chromosomes
-        int index = rnd() % _chromosomes.size();
+        int index = rand() % _chromosomes.size();
         // пока значения индекса совпадает со значение индекса наилучшей хромосомы
         while (index == _bestChromosomeIndex)
         {
-            index = rnd() % _chromosomes.size();
+            index = rand() % _chromosomes.size();
         }
         _chromosomes[index].Copy(_bestChromosome);
     }
@@ -400,22 +383,22 @@ public:
     }
 
     // функция отбора
-    void Selection(std::mt19937 &rnd)
+    void Selection()
     {
         // размер вектора _chromosomes
         int size = _chromosomes.size();
 
         for (int i = 0; i < size; ++i)
         {
-            int prob = rnd() % 100;
+            int prob = rand() % 100;
             if (prob < 20)
             {
-                int index1 = rnd() % size;
-                int index2 = rnd() % size;
+                int index1 = rand() % size;
+                int index2 = rand() % size;
 
                 while (index1 == index2)
                 {
-                    index2 = rnd() % size;
+                    index2 = rand() % size;
                 }
 
                 // переменная cost1 определяется как стоимость хромосомы
@@ -437,4 +420,3 @@ public:
         }
     }
 };
-

@@ -109,7 +109,7 @@ private:
     //считывание настроек
     int verData  = 33;
     int iterData = 10;
-    int popData = 11;
+    int popData = 111;
     QLineEdit* verLine ;
     QLineEdit* iterLine;
     QLineEdit* popLine;
@@ -125,7 +125,7 @@ private:
     QWidget *plashca;
     void SetSolution();
     Population *_population;
-    std::mt19937 rnd = std::mt19937(std::random_device{}());
+
 
     void readMatrixFromFile();
 

@@ -488,6 +488,7 @@ void MainWindow::ReadVer(){
         nextButton->hide();
         SetSolution();
         Solution();
+
     }
 
 
@@ -662,8 +663,8 @@ void MainWindow::SetSolution(){
 
     bool maximise= false ;
     matrix = CostMatrix(getSizeMatrix());
-    _population = new Population(rnd,popData,sizeMatrix,maximise);
-    //_population->Evaluate(matrix,iteration,best,good1,good2);
+    _population = new Population(popData,sizeMatrix,maximise);
+    //_population->Evaluate(matrix,best,good1,good2);
 }
 void MainWindow::Solution(){
 
@@ -674,12 +675,12 @@ void MainWindow::Solution(){
         //good1.clear();
         //good2.clear();
 
-        _population->StoreBestSolution(sizeMatrix);
-        _population->Mutate(rnd,verData);
-        _population->ApplyCrossover(rnd,sizeMatrix);
-        _population->SeedBestSolution(rnd);
-        _population->Evaluate(matrix,best,good1,good2);
-        _population->Selection(rnd);
+       // _population->StoreBestSolution(sizeMatrix);
+        _population->Mutate(verData);
+        _population->ApplyCrossover(sizeMatrix);
+        _population->SeedBestSolution();
+       // _population->Evaluate(matrix,best,good1,good2);
+        _population->Selection();
         iteration++;
         clear(other);
         Graph();
