@@ -2,6 +2,8 @@
 #include "./ui_mainwindow.h"
 #include <iostream>
 #include <fstream>
+
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -759,10 +761,6 @@ void MainWindow::SetSolution(){
   //  Population population(populationSize, taskSize, maximise);
 }
 
-void MainWindow:: set_plot(){
-    Graph_plot gr=Graph_plot();
-    gr.set_y()
-}
 
 void MainWindow::Solution(){
     clear(other);
@@ -787,7 +785,7 @@ void MainWindow::Solution(){
        // _population->Selection();
 
 
-        _population->Evaluate(costMatrix,best, good1, good2);
+        cost=_population->Evaluate(costMatrix,best, good1, good2);
         _population->StoreBestSolution(sizeMatrix);
         _population->Mutate(verData);
         _population->ApplyCrossover(sizeMatrix);
@@ -861,4 +859,51 @@ void MainWindow::Error(int numError){
     }
     error->show();
     newWindow->show();
+}
+
+void MainWindow:: build_graph(){
+    for (int i = 0; i < 5; ++i)
+        {
+            // Создаём представление графика
+           QChartView *chartView = new QChartView(this);
+            // Добавляем его в горизонтальный Layout
+            ui->horizontalLayout->addWidget(chartView);
+            // Создаём
+                    seed = cost;
+                    QLineSeries *series = new QLineSeries();
+                    int k = 0;
+                    while (k <= 100)
+                    {
+                        *series << QPointF(seed);
+                        ++k;
+                    }
+
+                    // Создаём график и добавляем в него функцию
+                    QChart *chart = new QChart();
+                    chart->addSeries(series);
+                    chart->legend()->hide();
+                    chart->setTitle("Graphic");
+
+                    // Добавим всплывающую подсказку для графика
+                    chart->setToolTip(QString("График №%1\n"
+                                              "Количество отсчётов %2").arg(i + 1).arg(k));
+
+                    // Настройка осей графика
+                    QValueAxis *axisX = new QValueAxis();
+                    axisX->setTitleText("x, м");
+                    axisX->setLabelFormat("%i");
+                    axisX->setTickCount(1);
+                    chart->addAxis(axisX, Qt::AlignBottom);
+                    series->attachAxis(axisX);
+
+                    QValueAxis *axisY = new QValueAxis();
+                    axisY->setTitleText("t, мс");
+                    axisY->setLabelFormat("%g");
+                    axisY->setTickCount(5);
+                    chart->addAxis(axisY, Qt::AlignLeft);
+                    series->attachAxis(axisY);
+
+                    // Устанавливаем график в представление
+                    chartView->setChart(chart);
+     }
 }
