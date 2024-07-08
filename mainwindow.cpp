@@ -758,6 +758,12 @@ void MainWindow::SetSolution(){
     // Инициализация популяции
   //  Population population(populationSize, taskSize, maximise);
 }
+
+void MainWindow:: set_plot(){
+    Graph_plot gr=Graph_plot();
+    gr.set_y()
+}
+
 void MainWindow::Solution(){
     clear(other);
 

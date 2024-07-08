@@ -4,7 +4,7 @@
 #include <QtWidgets>
 //#include <vector>
 #include "alg.cpp"
-
+#include "graph.cpp"
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
@@ -133,4 +133,3 @@ private:
 
 };
 #endif // MAINWINDOW_H
-

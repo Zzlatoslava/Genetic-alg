@@ -1,4 +1,4 @@
-#include <iostream>
+﻿#include <iostream>
 #include <string>
 #include <unordered_set>
 #include <random>
@@ -30,6 +30,12 @@ public:
 
     }
 
+    int Get_cost_vector(std::vector<int> &vec)
+       {
+              int sum;
+              sum=std::accumulate(vec.begin(),vec.end(),0);
+              return sum;
+       }
     // скрещивание
     Chromosome Crossover(Chromosome &chr    )
     {
@@ -249,7 +255,7 @@ public:
 
     // функция оценки
     // функция оценки
-    void Evaluate(CostMatrix &costMatrix, std::vector<int> &best, std::vector<int> &good1, std::vector<int> &good2)
+    int Evaluate(CostMatrix &costMatrix, std::vector<int> &best, std::vector<int> &good1, std::vector<int> &good2)
     {
         int bestCost = _maximise ? -1 : std::numeric_limits<int>::max();
         int secondBestCost = _maximise ? -1 : std::numeric_limits<int>::max();
@@ -258,7 +264,7 @@ public:
         int secondBestIndex = -1;
         int thirdBestIndex = -1;
         int size = _chromosomes.size();
-
+        int sum1,sum2,sum3;
         for (int i = 0; i < size; ++i)
         {
             // суммарная стоимость затрат хромосомы
@@ -312,20 +318,36 @@ public:
                 thirdBestCost = cost;
                 thirdBestIndex = i;
             }
+            if (bestIndex != -1)
+            {
+                _chromosomes[bestIndex].Get_vector(best);
+                sum1= _chromosomes[bestIndex].Get_cost_vector(best);
+            }
+            if (secondBestIndex != -1)
+            {
+                _chromosomes[secondBestIndex].Get_vector(good1);
+                 sum2= _chromosomes[secondBestIndex].Get_cost_vector(good1);
+            }
+            if (thirdBestIndex != -1)
+            {
+                _chromosomes[thirdBestIndex].Get_vector(good2);
+                sum3= _chromosomes[thirdBestIndex].Get_cost_vector(good2);
+            }
+            if (sum1<sum2){
+                 if (sum1<sum3){
+                            return sum1;
+                        }
+                        else{return sum3;}
+             }
+             else{
+                   if (sum2<sum3){
+                       return sum2;
+                   }
+                   else{return sum3;}
+             }
         }
 
-        if (bestIndex != -1)
-        {
-            _chromosomes[bestIndex].Get_vector(best);
-        }
-        if (secondBestIndex != -1)
-        {
-            _chromosomes[secondBestIndex].Get_vector(good1);
-        }
-        if (thirdBestIndex != -1)
-        {
-            _chromosomes[thirdBestIndex].Get_vector(good2);
-        }
+
     }
 
 
