@@ -271,7 +271,7 @@ public:
     }
 
     // функция оценки
-    void Evaluate(CostMatrix &costMatrix, int iteration, std::vector<int> &best,std::vector<int> &good1,
+    void Evaluate(CostMatrix &costMatrix,  std::vector<int> &best,std::vector<int> &good1,
                   std::vector<int> &good2)
     {
         int bestCost = 0;
@@ -280,10 +280,11 @@ public:
         int bestIndex = -1;
         int secondBestIndex = -1;
         int thirdBestIndex = -1;
-        int k ;
+        int size=_chromosomes.size();
         //std::vector<std::vector<int>> &res;
-        for (int i = 0; i < _chromosomes.size(); ++i)
+        for (int i = 0; i < size; ++i)
         {
+
             // суммарная стоимость затрат хромосомы
             long cost = costMatrix.GetChromosomeCost(_chromosomes[i], _maximise);
             _chromosomes[i].SetCost(cost);
@@ -317,6 +318,22 @@ public:
         _chromosomes[thirdBestIndex].Get_vector(good2);
     }
 
+    // ф-я скрещивания, в кач-ве аргументов принимает 2 родителей, случайное число и размер задачи
+    void Crossover(int parentIndex1, int parentIndex2, std::mt19937 &rnd, int taskSize,int size)
+    {
+        // выполняем одтоточесное скрещивание
+        Chromosome chr1 = _chromosomes[parentIndex1];
+        Chromosome chr2 = _chromosomes[parentIndex2];
+
+        Chromosome child1 = chr1.Crossover(chr2, rnd,size);
+        Chromosome child2 = chr2.Crossover(chr1, rnd,size);
+        // обращаемся к элементу вектора _chromosomes по индексу родителя parentIndex1
+        // и записываем в него скопированный child1
+        _chromosomes[parentIndex1].Copy(child1);
+        _chromosomes[parentIndex2].Copy(child2);
+    }
+
+
     // функция применения скрещивания
     void ApplyCrossover(std::mt19937 &rnd, int taskSize)
     {
@@ -340,25 +357,11 @@ public:
         }
     }
 
-    // ф-я скрещивания, в кач-ве аргументов принимает 2 родителей, случайное число и размер задачи
-    void Crossover(int parentIndex1, int parentIndex2, std::mt19937 &rnd, int taskSize,int size)
-    {
-        // выполняем одтоточесное скрещивание
-        Chromosome chr1 = _chromosomes[parentIndex1];
-        Chromosome chr2 = _chromosomes[parentIndex2];
-
-        Chromosome child1 = chr1.Crossover(chr2, rnd,size);
-        Chromosome child2 = chr2.Crossover(chr1, rnd,size);
-        // обращаемся к элементу вектора _chromosomes по индексу родителя parentIndex1
-        // и записываем в него скопированный child1
-        _chromosomes[parentIndex1].Copy(child1);
-        _chromosomes[parentIndex2].Copy(child2);
-    }
-
     // функция мутации, в кач-ве аргумента принимает случайное число
     void Mutate(std::mt19937 &rnd,int ver)
     {
-        for (int i = 0; i < _chromosomes.size(); ++i)
+            int size =_chromosomes.size();
+        for (int i = 0; i < size; ++i)
         {
             // для каждой хромосомы считаем число prob,
             // определенное как остаток от деления сгенерированного числа на 100
