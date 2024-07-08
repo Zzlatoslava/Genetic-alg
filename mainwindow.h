@@ -2,6 +2,11 @@
 #define MAINWINDOW_H
 #include <iostream>
 #include <QtWidgets>
+#include <QVBoxLayout>
+#include <QtCharts/QChart>
+#include <QtCharts/QValueAxis>
+#include <QtCharts/QLineSeries>
+
 //#include <vector>
 #include "alg.cpp"
 #include "graph.cpp"
@@ -97,7 +102,7 @@ private:
     void Solution();
     void NextSolution();
     void FinishSolution();
-
+    void build_graph();
 
 
 
@@ -127,7 +132,7 @@ private:
     void SetSolution();
     Population *_population;
 
-
+    int cost;
     void readMatrixFromFile();
 
 
