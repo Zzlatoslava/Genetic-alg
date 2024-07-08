@@ -134,7 +134,7 @@ void MainWindow::Matrix(){
 
 void MainWindow::createMatrix()
 {
-    clearSideMenu();
+   // clearSideMenu();
 
     if (countSpinBox->value() < 7){
         matrixTable = new QTableWidget(countSpinBox->value(), countSpinBox->value(), menu);
@@ -200,11 +200,12 @@ void MainWindow::handleFilledMatrix()
 {
     bool ok;
     sizeMatrix = matrixTable->rowCount();
+    costMatrix = CostMatrix(sizeMatrix);
     for (int i = 0; i < matrixTable->rowCount(); ++i) {
         for (int j = 0; j < matrixTable->rowCount(); ++j) {
             QTableWidgetItem *item = matrixTable->item(i, j);
             if (item) {
-                matrix.SetCost(i,j,item->text().toInt(&ok));
+                costMatrix.SetCost(i,j,item->text().toInt(&ok));
                 if (!ok){
                     Error(2);
                     break;
@@ -309,11 +310,10 @@ void MainWindow::getSizeRand(){
 
 
 void MainWindow::fill_random_num(){
-    matrix = CostMatrix(sizeMatrix);
+    costMatrix = CostMatrix(sizeMatrix);
     for (int i = 0; i < sizeMatrix; ++i) {
         for (int j = 0; j < sizeMatrix; ++j) {
-            matrix.SetCost(i,j,rand()%100);
-
+            costMatrix.SetCost(i,j,rand()%100);
         }
     }
 
@@ -348,11 +348,15 @@ void MainWindow::clearSideMenu()
             child->deleteLater();
         }
     }
-
+    sizeMatrix = 0;
     fileName = nullptr;
-    // matrix = nullptr;
-    sizeMatrix = 0 ;
+    costMatrix = CostMatrix(sizeMatrix);
+    iteration = 0;
     allFilled = false;
+    choice = false;
+
+
+
 
 }
 
@@ -488,6 +492,7 @@ void MainWindow::ReadVer(){
         nextButton->hide();
         SetSolution();
         Solution();
+        Graph();
 
     }
 
@@ -500,7 +505,7 @@ void MainWindow::ReadVer(){
 
 
 void MainWindow::Graph(){
-
+    clear(other);
     QLabel *answer = new QLabel("Решение:",other);
     font.setPointSize(20);
     answer->setFont(font);
@@ -508,8 +513,45 @@ void MainWindow::Graph(){
     answer->setStyleSheet("color: rgb(24, 24, 24);");
     answer->show();
 
+    int k = 0;
+    for (int it = 0 ; it< best.size() ; ++it){
+
+        QLabel *qanswer = new QLabel(QString::number(best[it]) ,other);
+        font.setPointSize(20);
+        qanswer->setFont(font);
+        qanswer->setGeometry(20+k,230, 200, 25);
+        qanswer->setStyleSheet("color: rgb(24, 24, 24);");
+        qanswer->show();
+        k+= 15;
+    }
+    k+= 15;
+    for (int it = 0 ; it< best.size() ; ++it){
+
+        QLabel *qanswer = new QLabel(QString::number(good1[it]) ,other);
+        font.setPointSize(20);
+        qanswer->setFont(font);
+        qanswer->setGeometry(20+k,230, 200, 25);
+        qanswer->setStyleSheet("color: rgb(24, 24, 24);");
+        qanswer->show();
+        k+= 15;
+    }
+
+    k+= 15;
+    for (int it = 0 ; it< best.size() ; ++it){
+
+        QLabel *qanswer = new QLabel(QString::number(good2[it]) ,other);
+        font.setPointSize(20);
+        qanswer->setFont(font);
+        qanswer->setGeometry(20+k,230, 200, 25);
+        qanswer->setStyleSheet("color: rgb(24, 24, 24);");
+        qanswer->show();
+        k+= 15;
+    }
+
+
+
     QLabel *iter = new QLabel("Итерация: "+QString::number(iteration),other);
-    //setting->setStyleSheet("background-color: rgb(140,178,188);");
+    setting->setStyleSheet("background-color: rgb(140,178,188);");
     font.setPointSize(20);
     iter->setFont(font);
     iter->setGeometry(20,250, 200, 25);
@@ -542,7 +584,7 @@ void MainWindow::Graph(){
         int y1 = 50 + i * spacing + radius / 2;
 
         int x2 = 250 + radius / 2;
-        int y2 = 50 + (best[i]-1) * spacing + radius / 2;
+        int y2 = 50 + (best[i]) * spacing + radius / 2;
         scene->addLine(x1, y1, x2, y2, QPen(QColor(33, 75, 86), 5));
 
     }
@@ -552,8 +594,8 @@ void MainWindow::Graph(){
         int y1 = 50 + i * spacing + radius / 2;
 
         int x2 = 250 + radius / 2;
-        int y2 = 50 + (good1[i]-1) * spacing + radius / 2;
-        scene->addLine(x1, y1, x2, y2, QPen(QColor(82, 122, 132), 5, Qt::DashLine));
+        int y2 = 50 + (good1[i]) * spacing + radius / 2;
+        scene->addLine(x1, y1, x2, y2, QPen(QColor(62, 152, 34), 5, Qt::DashLine));
 
     }
     for (int i = 0; i < numVertices; ++i) {
@@ -562,8 +604,8 @@ void MainWindow::Graph(){
         int y1 = 50 + i * spacing + radius / 2;
 
         int x2 = 250 + radius / 2;
-        int y2 = 50 + (good2[i]-1) * spacing + radius / 2;
-        scene->addLine(x1, y1, x2, y2, QPen(QColor(140, 178, 188), 5, Qt::DotLine));
+        int y2 = 50 + (good2[i]) * spacing + radius / 2;
+        scene->addLine(x1, y1, x2, y2, QPen(QColor(234, 144, 42), 5, Qt::DotLine));
 
     }
 
@@ -626,24 +668,20 @@ QPushButton* MainWindow::PushButtonSolution(QWidget* parent, const QString &text
 }
 
 void MainWindow::NextSolution(){
-
-
-    Solution();
+    for (iteration; iteration <= iterData; iteration++){
+        Solution();
+    }
 }
 
 void MainWindow::FinishSolution(){
 
+    for (iteration; iteration <= iterData; iteration++){
+        Solution();
+    }
 
     Solution();
 }
 
-int MainWindow::getSizeMatrix(){
-    if (sizeMatrix > 0 ){
-        return sizeMatrix;
-    }
-    return 0;
-
-}
 QString* MainWindow::getValMatrix(){
     //  if (matrix.GetCost(i,j)!=nullptr ){
     // return matrix;
@@ -662,9 +700,14 @@ void MainWindow::closeMatrix(){
 void MainWindow::SetSolution(){
 
     bool maximise= false ;
-    matrix = CostMatrix(getSizeMatrix());
+
     _population = new Population(popData,sizeMatrix,maximise);
     //_population->Evaluate(matrix,best,good1,good2);
+
+    //CostMatrix costMatrix(taskSize);
+
+    // Инициализация популяции
+  //  Population population(populationSize, taskSize, maximise);
 }
 void MainWindow::Solution(){
 
@@ -674,16 +717,30 @@ void MainWindow::Solution(){
         //best.clear();
         //good1.clear();
         //good2.clear();
+        //_population->Evaluate(costMatrix,sizeMatrix,  best, good1, good2);
 
-       // _population->StoreBestSolution(sizeMatrix);
+        // Сохраняем лучшую хромосому
+        //_population->StoreBestSolution(sizeMatrix);
+
+        // Применяем операторы генетического алгоритма
+       // _population->ApplyCrossover(sizeMatrix);
+        //_population->Mutate(verData);
+        //_population->SeedBestSolution();
+
+        // Проводим селекцию
+       // _population->Selection();
+
+
+        _population->Evaluate(costMatrix,best, good1, good2);
+        _population->StoreBestSolution(sizeMatrix);
         _population->Mutate(verData);
         _population->ApplyCrossover(sizeMatrix);
-        _population->SeedBestSolution();
-       // _population->Evaluate(matrix,best,good1,good2);
+        _population->SeedBestSolution(sizeMatrix);
+
         _population->Selection();
         iteration++;
-        clear(other);
-        Graph();
+
+
     }
 
 
@@ -700,7 +757,6 @@ void MainWindow::readMatrixFromFile() {
     }
 
     QTextStream in(&file);
-    QVector<QVector<int>> matrix;
     while (!in.atEnd()) {
         QString line = in.readLine();
         QStringList values = line.split(' ');
@@ -715,7 +771,7 @@ void MainWindow::readMatrixFromFile() {
             }
             row.append(num);
         }
-        matrix.append(row);
+        //costMatrix.append(row);
     }
 
     file.close();

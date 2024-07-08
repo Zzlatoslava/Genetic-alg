@@ -15,7 +15,7 @@ public:
     Chromosome(){
     }
 
-    Chromosome(int workers)
+    Chromosome(    int workers)
     {
         _size = workers;
         _workers = std::vector<int>(workers);
@@ -23,17 +23,15 @@ public:
     }
 
 
-
     int Get_vector(std::vector<int> &vec)
     {
-        vec.clear();
-        vec =_workers;
+        vec=_workers;
         return vec[_size] ;
 
     }
 
     // скрещивание
-    Chromosome Crossover(Chromosome &chr,int _size)
+    Chromosome Crossover(Chromosome &chr    )
     {
         Chromosome child(_size);
         // генерируем index1 ,index2
@@ -76,7 +74,7 @@ public:
     }
 
     // функция мутации
-    void Mutation( int ver)
+    void Mutation(   int ver)
     {
         for (int i = 0; i < _size; ++i)
         {
@@ -131,12 +129,12 @@ public:
         return _workers[worker];
     }
 
-    int GetRandomTask(  int taskRange)
+    int GetRandomTask(    int taskRange)
     {
         return rand() % taskRange;
     }
 
-    void Generate(  int taskRange)
+    void Generate(    int taskRange)
     {
         // назначает каждому рабочему случайную задачу
         for (int count = 0; count < _size; ++count)
@@ -204,20 +202,16 @@ public:
 
     // функция получения стоимости в хромосоме
     int GetChromosomeCost(Chromosome &chromosome, bool maximise)
-    // возвращает суммарную стоимость всех элементов хромосомы
     {
         int totalCost = 0;
-        std::unordered_set<int> assignments;
 
         for (int worker = 0; worker < _n; ++worker)
         {
             int task = chromosome.GetTask(worker);
-            assignments.insert(task);
             totalCost += GetCost(worker, task);
         }
 
-        int violations = _n - assignments.size();
-        return maximise ? totalCost - violations * 100 : totalCost + violations * 100;
+        return maximise ? totalCost : -totalCost;
     }
 };
 
@@ -232,7 +226,7 @@ private:
     bool _maximise; // переменная для минимизации
 
 public:
-    Population(  int populationSize, int taskSize, bool maximise = true)
+    Population(    int populationSize, int taskSize, bool maximise = true)
     {
         _bestChromosomeCost = maximise ? -1 : 9999999999;
         _bestChromosomeIndex = -1;
@@ -242,37 +236,56 @@ public:
     }
 
     // создаем произвольную популяцию
-    void CreateArbitraryPopulation(  int populationSize, int taskSize)
+    void CreateArbitraryPopulation(int populationSize, int taskSize)
     // в качестве аргументов подаем генератор псевдослучайных чисел размер популяции и задачи
     {
         for (int i = 0; i < populationSize; ++i)
         {
             // обращаемся к каждому элементу вектора _chromosomes по индексу
             // и каждому рабочему присваеваем случайную задачу для данной популяции
-            _chromosomes[i] = Chromosome(taskSize);
+            _chromosomes[i] = Chromosome( taskSize);
         }
     }
 
     // функция оценки
-    void Evaluate(CostMatrix &costMatrix,  std::vector<int> &best,std::vector<int> &good1,
-                  std::vector<int> &good2)
+    // функция оценки
+    void Evaluate(CostMatrix &costMatrix, std::vector<int> &best, std::vector<int> &good1, std::vector<int> &good2)
     {
-        int bestCost = 0;
-        int secondBestCost = 0;
-        int thirdBestCost = 0;
+        int bestCost = _maximise ? -1 : std::numeric_limits<int>::max();
+        int secondBestCost = _maximise ? -1 : std::numeric_limits<int>::max();
+        int thirdBestCost = _maximise ? -1 : std::numeric_limits<int>::max();
         int bestIndex = -1;
         int secondBestIndex = -1;
         int thirdBestIndex = -1;
-        int size=_chromosomes.size();
-        //std::vector<std::vector<int>> &res;
+        int size = _chromosomes.size();
+
         for (int i = 0; i < size; ++i)
         {
-
             // суммарная стоимость затрат хромосомы
             long cost = costMatrix.GetChromosomeCost(_chromosomes[i], _maximise);
             _chromosomes[i].SetCost(cost);
 
-            if (IsBetter(cost, bestCost)) {
+            std::unordered_set<int> assignedTasks;
+            bool hasDuplicate = false;
+
+            for (int worker = 0; worker < _chromosomes[i].Size(); ++worker)
+            {
+                int task = _chromosomes[i].GetTask(worker);
+                if (assignedTasks.find(task) != assignedTasks.end())
+                {
+                    hasDuplicate = true;
+                    break;
+                }
+                assignedTasks.insert(task);
+            }
+
+            if (hasDuplicate)
+            {
+                continue;
+            }
+
+            if (IsBetter(cost, bestCost))
+            {
                 // Сдвигаем второе и третье место вниз
                 thirdBestCost = secondBestCost;
                 thirdBestIndex = secondBestIndex;
@@ -282,7 +295,9 @@ public:
                 // Обновляем первое место
                 bestCost = cost;
                 bestIndex = i;
-            } else if (IsBetter(cost, secondBestCost)) {
+            }
+            else if (IsBetter(cost, secondBestCost))
+            {
                 // Сдвигаем третье место вниз
                 thirdBestCost = secondBestCost;
                 thirdBestIndex = secondBestIndex;
@@ -290,37 +305,36 @@ public:
                 // Обновляем второе место
                 secondBestCost = cost;
                 secondBestIndex = i;
-            } else if (IsBetter(cost, thirdBestCost)) {
+            }
+            else if (IsBetter(cost, thirdBestCost))
+            {
                 // Обновляем третье место
                 thirdBestCost = cost;
                 thirdBestIndex = i;
             }
         }
-        _chromosomes[bestIndex].Get_vector(best);
-        _chromosomes[secondBestIndex].Get_vector(good1);
-        _chromosomes[thirdBestIndex].Get_vector(good2);
+
+        if (bestIndex != -1)
+        {
+            _chromosomes[bestIndex].Get_vector(best);
+        }
+        if (secondBestIndex != -1)
+        {
+            _chromosomes[secondBestIndex].Get_vector(good1);
+        }
+        if (thirdBestIndex != -1)
+        {
+            _chromosomes[thirdBestIndex].Get_vector(good2);
+        }
     }
 
-    // ф-я скрещивания, в кач-ве аргументов принимает 2 родителей, случайное число и размер задачи
-    void Crossover(int parentIndex1, int parentIndex2,int size)
-    {
-        // выполняем одтоточесное скрещивание
-        Chromosome chr1 = _chromosomes[parentIndex1];
-        Chromosome chr2 = _chromosomes[parentIndex2];
 
-        Chromosome child1 = chr1.Crossover(chr2, size);
-        Chromosome child2 = chr2.Crossover(chr1, size);
-        // обращаемся к элементу вектора _chromosomes по индексу родителя parentIndex1
-        // и записываем в него скопированный child1
-        _chromosomes[parentIndex1].Copy(child1);
-        _chromosomes[parentIndex2].Copy(child2);
-    }
 
 
     // функция применения скрещивания
-    void ApplyCrossover(int sizeM)
+    void ApplyCrossover(    int taskSize)
     {
-        int size = sizeM;
+        int size = _chromosomes.size();
         for (int i = 0; i < size; ++i)
         {
             int prob = rand() % 100;
@@ -335,16 +349,30 @@ public:
                     index2 = rand() % size;
                 }
                 // вызываем функцию, с помощью которой проводим одноточечное скрещивание
-                Crossover(index1, index2,size);
+                Crossover(index1, index2, taskSize);
             }
         }
     }
 
-    // функция мутации, в кач-ве аргумента принимает случайное число
-    void Mutate(int ver)
+    // ф-я скрещивания, в кач-ве аргументов принимает 2 родителей, случайное число и размер задачи
+    void Crossover(int parentIndex1, int parentIndex2,     int taskSize)
     {
-        int size =_chromosomes.size();
-        for (int i = 0; i < size; ++i)
+        // выполняем одтоточесное скрещивание
+        Chromosome chr1 = _chromosomes[parentIndex1];
+        Chromosome chr2 = _chromosomes[parentIndex2];
+
+        Chromosome child1 = chr1.Crossover(chr2);
+        Chromosome child2 = chr2.Crossover(chr1);
+        // обращаемся к элементу вектора _chromosomes по индексу родителя parentIndex1
+        // и записываем в него скопированный child1
+        _chromosomes[parentIndex1].Copy(child1);
+        _chromosomes[parentIndex2].Copy(child2);
+    }
+
+    // функция мутации, в кач-ве аргумента принимает случайное число
+    void Mutate(   int ver)
+    {
+        for (int i = 0; i < _chromosomes.size(); ++i)
         {
             // для каждой хромосомы считаем число prob,
             // определенное как остаток от деления сгенерированного числа на 100
@@ -359,22 +387,34 @@ public:
 
     void StoreBestSolution(int taskSize)
     {
+        if (_bestChromosomeIndex == -1)
+        {
+
+        }
+        else {
+
         _bestChromosome = Chromosome(taskSize);
         _bestChromosome.Copy(_chromosomes[_bestChromosomeIndex]);
+        }
     }
 
-
-    void SeedBestSolution()
+    void SeedBestSolution(int taskSize)
     {
-        // определяется остатком от деления случайного числа на размер вектора  _chromosomes
-        int index = rand() % _chromosomes.size();
-        // пока значения индекса совпадает со значение индекса наилучшей хромосомы
+        if (_bestChromosomeIndex == -1)
+        {
+
+        }
+        else{
+
+        int index = rand() % taskSize;
         while (index == _bestChromosomeIndex)
         {
-            index = rand() % _chromosomes.size();
+            index = rand() % taskSize;
         }
         _chromosomes[index].Copy(_bestChromosome);
+        }
     }
+
 
     // ф-я для определения лучшей стоимости
     bool IsBetter(long cost1, long cost2)
@@ -383,7 +423,7 @@ public:
     }
 
     // функция отбора
-    void Selection()
+    void Selection(   )
     {
         // размер вектора _chromosomes
         int size = _chromosomes.size();

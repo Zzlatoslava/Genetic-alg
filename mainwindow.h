@@ -44,9 +44,9 @@ private:
     QPushButton *continueButton;
 
     //ответ
-    std::vector<int> best {4,2,3,1,5};
-    std::vector<int> good1 {1,3,3,4,1};
-    std::vector<int> good2 {3,1,4,2,5};
+    std::vector<int> best {0,1,2,3,4,5,6,7,8,9};
+    std::vector<int> good1  {0,1,2,3,4,5,6,7,8,9};
+    std::vector<int> good2  {0,1,2,3,4,5,6,7,8,9};
 
     //граф
     QGraphicsView *view;
@@ -58,7 +58,7 @@ private:
 
     //матрица
     int sizeMatrix = 0;
-    CostMatrix matrix= CostMatrix(0);
+    CostMatrix costMatrix = CostMatrix(0);
     QSpinBox* countSpinBox;
     QLabel *countLabel;
     QTableWidget *matrixTable;
@@ -101,7 +101,7 @@ private:
 
 
     QPushButton* PushButtonSolution(QWidget* parent, const QString &text, int x, int y, int width, int height);
-    int iteration = 1;
+    int iteration = 0;
     QWidget *other;
     //График
     void Plot();
