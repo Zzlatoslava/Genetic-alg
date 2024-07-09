@@ -579,6 +579,14 @@ void MainWindow::Graph(){
     iter->show();
 
 
+    QLabel *cs = new QLabel(QString::number(cost[iteration]),other);
+    //setting->setStyleSheet("background-color: rgb(140,178,188);");
+
+    cs->setFont(font);
+    cs->setGeometry(200,240, 200, 25);
+    cs->setStyleSheet("color: rgb(24, 24, 24);");
+    cs->show();
+
     int numVertices = sizeMatrix;
 
     finishButton = PushButtonSolution(solution, "Перейти в конец", 10, 545, 250, 45);
@@ -720,7 +728,7 @@ void MainWindow::closeMatrix(){
 
 void MainWindow::SetSolution(){
 
-    bool maximise = false ;
+    bool maximise = true ;
     _population = new Population(popData,sizeMatrix,maximise);
 }
 void MainWindow::Solution(){
