@@ -2,7 +2,11 @@
 #define MAINWINDOW_H
 #include <iostream>
 #include <QtWidgets>
+#include <QtCharts/QChartView>
+#include <QtCharts/QLineSeries>
+#include <QtCharts/QValueAxis>
 #include "alg.cpp"
+
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -128,6 +132,8 @@ private:
 
 
     void readMatrixFromFile();
+    void build_graph();
+    int cost;
 
 
 };
