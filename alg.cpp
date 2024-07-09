@@ -29,12 +29,11 @@ public:
         return vec[_size] ;
 
     }
-    int Get_cost_vector(std::vector<int> &vec)
-    {
-        int sum;
-        sum=std::accumulate(vec.begin(),vec.end(),0);
+    int Get_cost_vector(std::vector<int> &vec) {
+        int sum = std::accumulate(vec.begin(), vec.end(), 0);
         return sum;
     }
+
 
     // скрещивание
     Chromosome Crossover(Chromosome &chr    )
@@ -80,16 +79,15 @@ public:
     }
 
     // функция мутации
-    void Mutation(   int ver)
-    {
-        for (int i = 0; i < _size; ++i)
-        {
-            // если остаток от деления этого случайного числа меньше 33,
-            // то i-му рабочем назначается задача, полученная методом GetRandomTask(rand, _size)
+    void Mutation(int ver) {
+        for (int i = 0; i < _size; ++i) {
+            // если остаток от деления этого случайного числа меньше вероятности мутации,
+            // то i-му рабочему назначается новая случайная задача
             if (rand() % 100 < ver)
                 Assign(i, GetRandomTask(_size));
         }
     }
+
 
     // осуществляет копирование обьекта
     void Copy(Chromosome &chr)
@@ -259,98 +257,77 @@ public:
 
     // функция оценки
     // функция оценки
-    int Evaluate(CostMatrix &costMatrix, std::vector<int> &best, std::vector<int> &good1, std::vector<int> &good2){
-        int bestCost = _maximise ? -1 : std::numeric_limits<int>::max();
-        int secondBestCost = _maximise ? -1 : std::numeric_limits<int>::max();
-        int thirdBestCost = _maximise ? -1 : std::numeric_limits<int>::max();
+    int Evaluate(CostMatrix &costMatrix, std::vector<int> &best, std::vector<int> &good1, std::vector<int> &good2) {
+        // Инициализируем наименьшие стоимости как максимальные значения
+        int bestCost = std::numeric_limits<int>::max();
+        int secondBestCost = std::numeric_limits<int>::max();
+        int thirdBestCost = std::numeric_limits<int>::max();
+
+        // Инициализируем индексы наименьших стоимостей как -1 (нет решений)
         int bestIndex = -1;
         int secondBestIndex = -1;
         int thirdBestIndex = -1;
-        int size = _chromosomes.size();
-        int sum1,sum2,sum3;
 
-        for (int i = 0; i < size; ++i)
-        {
-            // суммарная стоимость затрат хромосомы
-            long cost = costMatrix.GetChromosomeCost(_chromosomes[i], _maximise);
-            _chromosomes[i].SetCost(cost);
-
+        // Проходим по всем хромосомам и ищем три наименьших стоимости
+        for (int i = 0; i < _chromosomes.size(); ++i) {
+            // Проверяем наличие дубликатов задач
             std::unordered_set<int> assignedTasks;
             bool hasDuplicate = false;
 
-            for (int worker = 0; worker < _chromosomes[i].Size(); ++worker)
-            {
+            for (int worker = 0; worker < _chromosomes[i].Size(); ++worker) {
                 int task = _chromosomes[i].GetTask(worker);
-                if (assignedTasks.find(task) != assignedTasks.end())
-                {
+                if (assignedTasks.find(task) != assignedTasks.end()) {
                     hasDuplicate = true;
                     break;
                 }
                 assignedTasks.insert(task);
             }
 
-            if (hasDuplicate)
-            {
+            if (hasDuplicate) {
+                _chromosomes[i].SetCost(std::numeric_limits<int>::max()); // Устанавливаем максимальную стоимость для дубликатов
                 continue;
             }
 
-            if (IsBetter(cost, bestCost))
-            {
-                // Сдвигаем второе и третье место вниз
+            // Получаем стоимость хромосомы от матрицы стоимостей
+            int cost = costMatrix.GetChromosomeCost(_chromosomes[i], false); // Предполагаем, что минимизируем стоимость
+
+            // Обновляем наименьшие стоимости и их индексы
+            if (cost < bestCost && cost > 0) {
                 thirdBestCost = secondBestCost;
                 thirdBestIndex = secondBestIndex;
                 secondBestCost = bestCost;
                 secondBestIndex = bestIndex;
-
-                // Обновляем первое место
                 bestCost = cost;
                 bestIndex = i;
-            }
-            else if (IsBetter(cost, secondBestCost))
-            {
-                // Сдвигаем третье место вниз
+            } else if (cost < secondBestCost && cost > 0) {
                 thirdBestCost = secondBestCost;
                 thirdBestIndex = secondBestIndex;
-
-                // Обновляем второе место
                 secondBestCost = cost;
                 secondBestIndex = i;
-            }
-            else if (IsBetter(cost, thirdBestCost))
-            {
-                // Обновляем третье место
+            } else if (cost < thirdBestCost && cost > 0) {
                 thirdBestCost = cost;
                 thirdBestIndex = i;
             }
         }
 
-        if (bestIndex != -1)
-        {
+        // Очищаем векторы, чтобы заполнить новыми значениями
+        best.clear();
+        good1.clear();
+        good2.clear();
+
+        // Добавляем наименьшие стоимости в соответствующие векторы
+        if (bestIndex != -1) {
             _chromosomes[bestIndex].Get_vector(best);
-            sum1= _chromosomes[bestIndex].Get_cost_vector(best);
         }
-        if (secondBestIndex != -1)
-        {
+        if (secondBestIndex != -1 && secondBestIndex != bestIndex) {
             _chromosomes[secondBestIndex].Get_vector(good1);
-            sum2= _chromosomes[secondBestIndex].Get_cost_vector(good1);
         }
-        if (thirdBestIndex != -1)
-        {
+        if (thirdBestIndex != -1 && thirdBestIndex != bestIndex && thirdBestIndex != secondBestIndex) {
             _chromosomes[thirdBestIndex].Get_vector(good2);
-            sum3= _chromosomes[thirdBestIndex].Get_cost_vector(good2);
         }
-        if (sum1<sum2){
-            if (sum1<sum3){
-                return sum1;
-            }
-            else{return sum3;}
-        }
-        else{
-            if (sum2<sum3){
-                return sum2;
-            }
-            else{return sum3;}
-        }
+
+        // Возвращаем стоимость лучшей хромосомы
+        return bestCost;
     }
 
 
@@ -398,15 +375,12 @@ public:
     }
 
     // функция мутации, в кач-ве аргумента принимает случайное число
-    void Mutate(   int ver)
-    {
-        for (int i = 0; i < _chromosomes.size(); ++i)
-        {
+    void Mutate(int ver) {
+        for (int i = 0; i < _chromosomes.size(); ++i) {
             // для каждой хромосомы считаем число prob,
             // определенное как остаток от деления сгенерированного числа на 100
             int prob = rand() % 100;
-            if (prob < 5)
-            {
+            if (prob < ver) { // Учитываем вероятность мутации
                 // для каждого элемента вектора _chromosomes вызываем функцию Mutation
                 _chromosomes[i].Mutation(ver);
             }
@@ -445,10 +419,10 @@ public:
 
 
     // ф-я для определения лучшей стоимости
-    bool IsBetter(long cost1, long cost2)
-    {
+    bool IsBetter(long cost1, long cost2) {
         return _maximise ? cost1 > cost2 : cost1 < cost2;
     }
+
 
     // функция отбора
     void Selection(   )
