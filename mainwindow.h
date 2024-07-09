@@ -90,7 +90,7 @@ private:
     void getSizeRand();
     void fill_random_num();
 
-    void clearSideMenu();
+    void clearSideMenu(bool flag);
     void clear(QWidget* parent);
 
     //решение
@@ -126,7 +126,7 @@ private:
     int getSizeMatrix();
     QString* getValMatrix();
 
-    QWidget *plashca;
+
     void SetSolution();
     Population *_population;
 
@@ -134,7 +134,7 @@ private:
     void readMatrixFromFile();
     void build_graph();
     int cost;
-
+    void seeMatrix();
 
 };
 #endif // MAINWINDOW_H

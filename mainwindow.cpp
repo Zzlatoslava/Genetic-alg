@@ -35,8 +35,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     //боковое меню
     SideMenu();
-    //view = new QGraphicsView(graph);
-    //scene = new QGraphicsScene(graph);
+
     //решение
 
 
@@ -52,11 +51,6 @@ MainWindow::MainWindow(QWidget *parent)
     connect(matrixButton, &QPushButton::clicked, this, &MainWindow::Matrix);
     connect(fileButton, &QPushButton::clicked, this, &MainWindow::File);
     connect(randomButton, &QPushButton::clicked, this, &MainWindow::Random);
-
-
-    //plashca = new QWidget(solution);
-    //plashca->setGeometry(450, 50, 650,550);
-    //plashca->setStyleSheet("background-color: rgb(244, 244, 244)");
 
 
 
@@ -111,12 +105,12 @@ void MainWindow::Matrix(){
     if (scene != nullptr){
            scene->clear();
     }
-    clearSideMenu();
+    clearSideMenu(true);
     clear(setting);
     clear(other);
     countLabel = new QLabel("Количество \nработников:", menu);
     countSpinBox = new QSpinBox(menu);
-    countSpinBox->setMinimum(2);
+    countSpinBox->setMinimum(3);
     countSpinBox->setMaximum(10);
 
     font.setPointSize(15);
@@ -224,6 +218,7 @@ void MainWindow::handleFilledMatrix()
         textError->setFont(font);
         textError->setGeometry(10,305, 280, 50);
         textError->show();
+        seeMatrix();
         SettingMenu();
     }
 
@@ -235,7 +230,7 @@ void MainWindow::File(){
     if (scene != nullptr){
         scene->clear();
     }
-    clearSideMenu();
+    clearSideMenu(true);
     clear(setting);
     clear(other);
     QLabel *text = new QLabel("Название:", menu);
@@ -268,6 +263,7 @@ void MainWindow::ReadLine(){
 
         //функция чтения
         readMatrixFromFile();
+        seeMatrix();
         SettingMenu();
     }
 }
@@ -278,12 +274,12 @@ void MainWindow::Random(){
     if (scene != nullptr){
         scene->clear();
     }
-    clearSideMenu();
+    clearSideMenu(true);
     clear(setting);
     clear(other);
     countLabel = new QLabel("Количество \nработников:", menu);
     countSpinBox = new QSpinBox(menu);
-    countSpinBox->setMinimum(2);
+    countSpinBox->setMinimum(3);
     countSpinBox->setMaximum(10);
 
     font.setPointSize(15);
@@ -323,6 +319,7 @@ void MainWindow::fill_random_num(){
             costMatrix.SetCost(i,j,rand()%100);
         }
     }
+    seeMatrix();
 
 }
 
@@ -342,7 +339,7 @@ QPushButton* MainWindow::DataEntryButton(){
     return nullptr;
 }
 
-void MainWindow::clearSideMenu()
+void MainWindow::clearSideMenu(bool flag)
 {
 
     QList<QWidget*> children = menu->findChildren<QWidget*>();
@@ -355,13 +352,14 @@ void MainWindow::clearSideMenu()
             child->deleteLater();
         }
     }
-    sizeMatrix = 0;
-    fileName = nullptr;
+    if (flag){
+   sizeMatrix = 0;
+   fileName = nullptr;
     costMatrix = CostMatrix(sizeMatrix);
     iteration = 0;
     allFilled = false;
     choice = false;
-
+    }
 
 
 
@@ -378,9 +376,7 @@ void MainWindow::clear(QWidget* parent)
         }
     }
     setting->setStyleSheet("background-color: rgb(244, 244, 244)");
-   // setting->hide();
 
-    //plashca->show();
 
 }
 
@@ -395,7 +391,7 @@ void MainWindow::SolutionMenu(){
 
     graph = new QWidget(solution);
     graph->setGeometry(450, 50, 650,500);
-    graph->setStyleSheet("background-color: rgb(140,178,188);");
+    //graph->setStyleSheet("background-color: rgb(140,178,188);");
 
     view = new QGraphicsView(graph);
     scene = new QGraphicsScene(graph);
@@ -521,15 +517,7 @@ void MainWindow::ReadVer(){
 
 
 void MainWindow::Graph(){
-   // clear(other);
-
-    //scene->clear();
-
-
-
-   scene->clear();
-
-
+     scene->clear();
 
 
     QLabel *answer = new QLabel("Решение:",other);
@@ -584,21 +572,8 @@ void MainWindow::Graph(){
     iter->setStyleSheet("color: rgb(24, 24, 24);");
     iter->show();
 
-    //iteration++;
+
     int numVertices = best.size();
-
-    //plashca->hide();
-
-
-
-    //view->show();
-    //graph->show();
-
-
-
-
-
-
 
     finishButton = PushButtonSolution(solution, "Перейти в конец", 10, 545, 250, 45);
     continueButton = PushButtonSolution(solution, "Далее", 1000, 555, 90, 40);
@@ -723,12 +698,6 @@ void MainWindow::FinishSolution(){
 
 }
 
-QString* MainWindow::getValMatrix(){
-    //  if (matrix.GetCost(i,j)!=nullptr ){
-    // return matrix;
-    //}
-    return 0;
-}
 
 void MainWindow::closeMatrix(){
     matrixTable->close();
@@ -740,38 +709,12 @@ void MainWindow::closeMatrix(){
 
 void MainWindow::SetSolution(){
 
-    bool maximise= false ;
+    bool maximise = false ;
 
     _population = new Population(popData,sizeMatrix,maximise);
-    //_population->Evaluate(matrix,best,good1,good2);
-
-    //CostMatrix costMatrix(taskSize);
-
-    // Инициализация популяции
-  //  Population population(populationSize, taskSize, maximise);
 }
 void MainWindow::Solution(){
     clear(other);
-
-
-
-
-        //best.clear();
-        //good1.clear();
-        //good2.clear();
-        //_population->Evaluate(costMatrix,sizeMatrix,  best, good1, good2);
-
-        // Сохраняем лучшую хромосому
-        //_population->StoreBestSolution(sizeMatrix);
-
-        // Применяем операторы генетического алгоритма
-       // _population->ApplyCrossover(sizeMatrix);
-        //_population->Mutate(verData);
-        //_population->SeedBestSolution();
-
-        // Проводим селекцию
-       // _population->Selection();
-
 
     cost = _population->Evaluate(costMatrix,best, good1, good2);
         _population->StoreBestSolution(sizeMatrix);
@@ -794,7 +737,7 @@ void MainWindow::readMatrixFromFile() {
 
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         Error(3);
-        clearSideMenu();
+        clearSideMenu(true);
         return;
     }
 
@@ -921,4 +864,24 @@ void MainWindow::Plot(){
     pixmap = pixmap.scaled(imageLabel->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
     imageLabel->setPixmap(pixmap);
     imageLabel->show();
+}
+
+void MainWindow::seeMatrix(){
+    clearSideMenu(false);
+    int  dx = 270/sizeMatrix;
+    int dy = 200/sizeMatrix;
+    for (int i = 0 ; i < sizeMatrix; i++){
+        for (int j = 0 ; j < sizeMatrix; j++){
+            QLabel *seeM = new QLabel(QString::number(costMatrix.GetCost(j,i)) ,menu);
+            font.setPointSize(10);
+            seeM->setFont(font);
+            seeM->setGeometry(25+dx*i,350 +dy*j,25 , 15);
+            seeM->setStyleSheet("color: rgb(24, 24, 24);");
+            seeM->show();
+
+        }
+    }
+    //QLabel *seeM = new QLabel(menu);
+
+
 }
