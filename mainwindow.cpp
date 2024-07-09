@@ -359,8 +359,11 @@ void MainWindow::clearSideMenu(bool flag)
     iteration = 0;
     allFilled = false;
     choice = false;
+    if(finishButton != nullptr){
+    finishButton->hide();
+    continueButton->hide();
     }
-
+    }
 
 
 }
@@ -528,6 +531,7 @@ void MainWindow::Graph(){
     answer->show();
 
     int k = 0;
+    if(best.size() != 0){
     for (int it = 0 ; it< best.size() ; ++it){
 
         QLabel *qanswer = new QLabel(QString::number(best[it]+1) ,other);
@@ -537,8 +541,9 @@ void MainWindow::Graph(){
         qanswer->setStyleSheet("color: rgb(24, 24, 24);");
         qanswer->show();
         k+= 15;
-    }
+    }}
     k+= 15;
+    if(good1.size() != 0){
     for (int it = 0 ; it< best.size() ; ++it){
 
         QLabel *qanswer = new QLabel(QString::number(good1[it]+1) ,other);
@@ -548,9 +553,10 @@ void MainWindow::Graph(){
         qanswer->setStyleSheet("color: rgb(24, 24, 24);");
         qanswer->show();
         k+= 15;
-    }
+    }}
 
     k+= 15;
+    if(good2.size() != 0){
     for (int it = 0 ; it< best.size() ; ++it){
 
         QLabel *qanswer = new QLabel(QString::number(good2[it]+1) ,other);
@@ -560,7 +566,7 @@ void MainWindow::Graph(){
         qanswer->setStyleSheet("color: rgb(24, 24, 24);");
         qanswer->show();
         k+= 15;
-    }
+    }}
 
 
 
@@ -573,7 +579,7 @@ void MainWindow::Graph(){
     iter->show();
 
 
-    int numVertices = best.size();
+    int numVertices = sizeMatrix;
 
     finishButton = PushButtonSolution(solution, "Перейти в конец", 10, 545, 250, 45);
     continueButton = PushButtonSolution(solution, "Далее", 1000, 555, 90, 40);
@@ -582,7 +588,7 @@ void MainWindow::Graph(){
     const int radius = 30;
     const int spacing = (490)/numVertices;
 
-
+    if(best.size() != 0){
     for (int i = 0; i < numVertices; ++i) {
 
         int x1 = 50 + radius / 2;
@@ -593,6 +599,9 @@ void MainWindow::Graph(){
         scene->addLine(x1, y1, x2, y2, QPen(QColor(33, 75, 86), 5));
 
     }
+    }
+
+    if(good1.size() != 0){
     for (int i = 0; i < numVertices; ++i) {
 
         int x1 = 50 + radius / 2;
@@ -603,6 +612,8 @@ void MainWindow::Graph(){
         scene->addLine(x1, y1, x2, y2, QPen(QColor(62, 152, 34), 5, Qt::DashLine));
 
     }
+    }
+    if(good2.size() != 0){
     for (int i = 0; i < numVertices; ++i) {
 
         int x1 = 50 + radius / 2;
@@ -612,7 +623,7 @@ void MainWindow::Graph(){
         int y2 = 50 + (good2[i]) * spacing + radius / 2;
         scene->addLine(x1, y1, x2, y2, QPen(QColor(234, 144, 42), 5, Qt::DotLine));
 
-    }
+    }}
 
     // Создаем вершины множества U
     for (int i = 0; i < numVertices; ++i) {
@@ -710,16 +721,18 @@ void MainWindow::closeMatrix(){
 void MainWindow::SetSolution(){
 
     bool maximise = false ;
-
     _population = new Population(popData,sizeMatrix,maximise);
 }
 void MainWindow::Solution(){
     clear(other);
 
-    cost = _population->Evaluate(costMatrix,best, good1, good2);
+       //srand(time(0));
+    srand(static_cast<unsigned int>(time(nullptr)));
+    cost.push_back(_population->Evaluate(costMatrix,best, good1, good2));
         _population->StoreBestSolution(sizeMatrix);
         _population->Mutate(verData);
         _population->ApplyCrossover(sizeMatrix);
+
         _population->SeedBestSolution(sizeMatrix);
 
         _population->Selection();
@@ -806,22 +819,23 @@ void MainWindow::Error(int numError){
 
 void MainWindow:: build_graph(){
     // Create chart view and set its geometry
-    for (int i = 0; i < 5; ++i)
-    {
+
+
         // Создаём представление графика
         QChartView *chartView = new QChartView(other);
-        chartView->setGeometry(20, 280, 500, 250);
+        chartView->setGeometry(20, 280, 450, 250);
         // Добавляем его в горизонтальный Layout
-       // ui->horizontalLayout->addWidget(chartView);
+        // ui->horizontalLayout->addWidget(chartView);
         // Создаём
-        int seed = cost;
-        QLineSeries *series = new QLineSeries();
+
+        QLineSeries* series = new QLineSeries();
         int k = 0;
-        while (k <= 100)
+        for (int i = 0 ; i < cost.size(); i++)
         {
-            *series << QPointF(k, seed);
-            ++k;
+            series->append(i, cost[i]); //точка зад коорд x,y
+
         }
+
 
         // Создаём график и добавляем в него функцию
         QChart *chart = new QChart();
@@ -830,19 +844,19 @@ void MainWindow:: build_graph(){
         chart->setTitle("Graphic");
 
         // Добавим всплывающую подсказку для графика
-        chart->setToolTip(QString("График №%1\n"
-                                  "Количество отсчётов %2").arg(i + 1).arg(k));
+       // chart->setToolTip(QString("График №%1\n"
+       //                           "Количество отсчётов %2").arg(i + 1).arg(k));
 
         // Настройка осей графика
         QValueAxis *axisX = new QValueAxis();
-        axisX->setTitleText("x, м");
+        axisX->setTitleText("№ итерации");
         axisX->setLabelFormat("%i");
         axisX->setTickCount(1);
         chart->addAxis(axisX, Qt::AlignBottom);
         series->attachAxis(axisX);
 
         QValueAxis *axisY = new QValueAxis();
-        axisY->setTitleText("t, мс");
+        axisY->setTitleText("Наилучшая стоимость");
         axisY->setLabelFormat("%g");
         axisY->setTickCount(5);
         chart->addAxis(axisY, Qt::AlignLeft);
@@ -851,8 +865,9 @@ void MainWindow:: build_graph(){
         // Устанавливаем график в представление
         chartView->setChart(chart);
         chartView->show();
-    }
+
 }
+
 
 
 void MainWindow::Plot(){

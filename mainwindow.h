@@ -43,8 +43,8 @@ private:
     QPushButton *DaleeButtom;
     QPushButton *nextButton;
     QLabel *textError;
-    QPushButton *finishButton;
-    QPushButton *continueButton;
+    QPushButton *finishButton = nullptr;
+    QPushButton *continueButton = nullptr;
 
     //ответ
     std::vector<int> best {0,0,0,0,0,0,0,0,0,0};
@@ -112,8 +112,8 @@ private:
 
     //считывание настроек
     int verData  = 33;
-    int iterData = 10;
-    int popData = 111;
+    int iterData = 100;
+    int popData = 100;
     QLineEdit* verLine ;
     QLineEdit* iterLine;
     QLineEdit* popLine;
@@ -133,7 +133,7 @@ private:
 
     void readMatrixFromFile();
     void build_graph();
-    int cost;
+    std::vector<int> cost;
     void seeMatrix();
 
 };
